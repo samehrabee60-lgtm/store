@@ -9,7 +9,14 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/images/logo.png', height: 40),
+        title: Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: Image.asset('assets/images/logo.png', height: 40),
+        ),
         centerTitle: true,
       ),
       drawer: AppDrawer(),
@@ -35,7 +42,21 @@ class AboutScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 20),
-                Image.asset('assets/images/logo.png', height: 150),
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset('assets/images/logo.png', height: 150),
+                ),
                 SizedBox(height: 30),
                 Text(
                   'بيتا لاب جروب',

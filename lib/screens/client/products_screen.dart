@@ -21,7 +21,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/images/logo.png', height: 40),
+        title: Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: Image.asset('assets/images/logo.png', height: 40),
+        ),
         centerTitle: true,
       ),
       body: Column(
