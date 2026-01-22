@@ -3,7 +3,7 @@ name: Flutter Build APK
 on:
   push:
     branches:
-      - main  # تأكد أن هذا هو اسم الفرع الرئيسي لديك
+      - main
   pull_request:
     branches:
       - main
@@ -13,19 +13,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. جلب الكود من المستودع
+      # 1. جلب الكود من المستودع (تحديث لـ v4)
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. إعداد نسخة Java المطلوبة لبناء الأندرويد (إصدار 17 هو الأنسب لـ Flutter الحديث)
+      # 2. إعداد Java (تحديث لـ v4)
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
 
-      # 3. إعداد نسخة Flutter (تم تحديد الإصدار 3.38.7 بناءً على رسالة الخطأ السابقة)
+      # 3. إعداد Flutter (إصدار متوافق)
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -33,21 +33,23 @@ jobs:
           channel: 'stable'
           cache: true
 
-      # 4. تحميل المكتبات البرمجية
+      # 4. تحميل المكتبات
       - name: Install dependencies
         run: flutter pub get
 
-      # 5. تنظيف المشروع قبل البناء لتجنب تعارضات الملفات المؤقتة
+      # 5. تنظيف المشروع
       - name: Clean project
         run: flutter clean
 
-      # 6. بناء ملف APK (Release) مع تجاهل أخطاء الأيقونات لضمان نجاح البناء
+      # 6. بناء ملف APK
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
 
-      # 7. رفع الملف الناتج (APK) ليكون متاحاً للتحميل من GitHub
+      # 7. رفع الملف الناتج (استخدام v4 بدلاً من v3 المرفوضة)
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          # ملاحظة: v4 تتطلب اسماً فريداً لكل رفع إذا تكرر في نفس الدورة
+          if-no-files-found: error
