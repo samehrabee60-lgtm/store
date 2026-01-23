@@ -1,82 +1,64 @@
 import 'package:flutter/material.dart';
-import '../../models/product_model.dart';
-import '../../models/cart_model.dart';
-import '../../models/review_model.dart';
+import 'package:firebase_database/firebase_database.dart';
+import '../../models/product_model.dart'; // تأكد من صحة المسار
 import '../../services/database_service.dart';
-import '../../services/auth_service.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class ProductDetailsScreen extends StatelessWidget {
+class ProductDetailsScreen extends StatefulWidget {
   final Product product;
 
+<<<<<<< HEAD
   const ProductDetailsScreen({Key? key, required this.product})
       : super(key: key);
+=======
+  const ProductDetailsScreen({super.key, required this.product});
+>>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
 
-  Future<void> _launchWhatsApp() async {
-    final String phone =
-        "+201000000000"; // TODO: Replace with user's phone number
-    final String message = "مرحبا، أريد الاستفسار عن المنتج: ${product.name}";
-    final Uri url = Uri.parse(
-      "https://wa.me/$phone?text=${Uri.encodeComponent(message)}",
-    );
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      throw 'Could not launch $url';
-    }
-  }
+  @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  final TextEditingController _reviewController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          padding: EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: Image.asset('assets/images/logo.png', height: 40),
-        ),
-        centerTitle: true,
+        title: Text(widget.product.name),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
+            // عرض صورة المنتج
+            Image.network(
+              widget.product.imageUrl,
               height: 300,
               width: double.infinity,
-              color: Colors.white,
-              child: product.imageUrl.isNotEmpty
-                  ? Image.network(
-                      product.imageUrl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Icon(Icons.image, size: 100),
-                    )
-                  : Icon(Icons.image, size: 100),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.image_not_supported, size: 100),
             ),
+            
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    widget.product.name,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Text(
-                    '${product.price} ج.م',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    '${widget.product.price} ج.م',
+                    style: const TextStyle(fontSize: 20, color: Colors.blue),
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'الوصف:',
+                  const Divider(),
+                  const Text(
+                    'التقييمات والمراجعات',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
+<<<<<<< HEAD
                   Text(product.description, style: TextStyle(fontSize: 16)),
                   SizedBox(height: 30),
                   SizedBox(
@@ -160,9 +142,17 @@ class ProductDetailsScreen extends StatelessWidget {
                   StreamBuilder<List<ReviewModel>>(
                     stream: DatabaseService().getReviews(product.id),
                     builder: (context, snapshot) {
+=======
+                  
+                  // إصلاح استدعاء getReviews (الذي سبب خطأ البناء)
+                  StreamBuilder(
+                    stream: DatabaseService().getReviews(widget.product.id),
+                    builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+>>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const CircularProgressIndicator();
                       }
+<<<<<<< HEAD
                       if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Column(
                           children: [
@@ -220,18 +210,66 @@ class ProductDetailsScreen extends StatelessWidget {
                             child: Text('أضف تقييمك'),
                           ),
                         ],
+=======
+                      
+                      if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Text('لا توجد تقييمات لهذا المنتج بعد.'),
+                        );
+                      }
+
+                      Map<dynamic, dynamic> reviews = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: reviews.length,
+                        itemBuilder: (context, index) {
+                          var review = reviews.values.elementAt(index);
+                          return ListTile(
+                            leading: const Icon(Icons.person),
+                            title: Text(review['comment'] ?? ''),
+                            subtitle: Text('التقييم: ${review['rating']}'),
+                          );
+                        },
+>>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
                       );
                     },
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // حقل إضافة تقييم جديد
+                  TextField(
+                    controller: _reviewController,
+                    decoration: const InputDecoration(
+                      labelText: 'أضف تعليقك...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_reviewController.text.isNotEmpty) {
+                        // إصلاح استدعاء addReview (الذي سبب خطأ البناء)
+                        await DatabaseService().addReview(widget.product.id, {
+                          'comment': _reviewController.text,
+                          'rating': 5, // افتراضي مؤقتاً
+                          'date': DateTime.now().toIso8601String(),
+                        });
+                        _reviewController.clear();
+                      }
+                    },
+                    child: const Text('إرسال التقييم'),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
+<<<<<<< HEAD
 
   void _showAddReviewModelDialog(BuildContext context) {
     final _commentController = TextEditingController();
@@ -320,4 +358,6 @@ class ProductDetailsScreen extends StatelessWidget {
       },
     );
   }
+=======
+>>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
 }

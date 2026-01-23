@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/order_model.dart';
-import '../../models/cart_model.dart'; // Import CartItem
-import '../../services/database_service.dart';
-import '../../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // ضروري لتحديد هوية المستخدم
+import '../../services/database_service.dart'; // استيراد الخدمة المحدثة
 
+<<<<<<< HEAD
 class CheckoutScreen extends StatefulWidget {
   final double totalAmount;
   final List<CartItem> cartItems;
@@ -84,55 +83,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     }
   }
+=======
+class CheckoutScreen extends StatelessWidget {
+  const CheckoutScreen({super.key});
+>>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser; // جلب المستخدم الحالي
+
     return Scaffold(
-      appBar: AppBar(title: Text('إتمام الطلب')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Text(
-                'إجمالي المبلغ: ${widget.totalAmount} ج.م',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'العنوان بالتفصيل',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال العنوان';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _address = value!;
-                },
-                maxLines: 3,
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submitOrder,
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: _isLoading
-                      ? CircularProgressIndicator(color: Colors.white)
-                      : Text('تأكيد الطلب', style: TextStyle(fontSize: 18)),
-                ),
-              ),
-            ],
-          ),
+      appBar: AppBar(title: const Text('إتمام الشراء')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            if (user != null) {
+              try {
+                // استدعاء الوظيفة التي قمنا بتعريفها في DatabaseService
+                await DatabaseService().clearCart(user.uid);
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('تمت عملية الشراء بنجاح وتم مسح السلة')),
+                );
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('حدث خطأ: $e')),
+                );
+              }
+            }
+          },
+          child: const Text('تأكيد الطلب ومسح السلة'),
         ),
       ),
     );
