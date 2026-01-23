@@ -192,8 +192,9 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value!.isEmpty) return 'الرجاء إدخال السعر';
-                  if (double.tryParse(value) == null)
+                  if (double.tryParse(value) == null) {
                     return 'الرجاء إدخال رقم صحيح';
+                  }
                   return null;
                 },
               ),

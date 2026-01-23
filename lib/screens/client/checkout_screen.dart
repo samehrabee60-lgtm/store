@@ -19,7 +19,7 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _address = '';
+  final String _address = '';
   bool _isLoading = false;
 
   Future<void> _submitOrder() async {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -19,12 +21,14 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        if (_emailController.text.trim().toLowerCase() != 'sameh.rabee007@gmail.com') {
+        if (_emailController.text.trim().toLowerCase() !=
+            'sameh.rabee007@gmail.com') {
           throw 'عذراً، هذا الحساب غير مصرح له بدخول لوحة الإدارة.';
         }
 
-        await AuthService().signInWithEmail(_emailController.text.trim(), _passwordController.text.trim());
-        
+        await AuthService().signInWithEmail(
+            _emailController.text.trim(), _passwordController.text.trim());
+
         setState(() {
           _isLoading = false;
         });
@@ -95,8 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _login,
-                    child: _isLoading 
-                        ? CircularProgressIndicator(color: Colors.white) 
+                    child: _isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
                         : Text('دخول'),
                   ),
                 ),

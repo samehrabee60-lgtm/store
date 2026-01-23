@@ -5,6 +5,8 @@ import '../../services/auth_service.dart';
 // import 'package:intl/intl.dart'; // Add intl dependency if needed, or format manually
 
 class MyOrdersScreen extends StatelessWidget {
+  const MyOrdersScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final user = AuthService().currentUser;

@@ -4,13 +4,15 @@ import 'package:firebase_database/firebase_database.dart'; // إضافة مكت�
 import '../../widgets/app_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
-  final List<String> imgList = [
+  const HomeScreen({super.key});
+
+  final List<String> imgList = const [
     'https://via.placeholder.com/800x400?text=Offer+1',
     'https://via.placeholder.com/800x400?text=Offer+2',
     'https://via.placeholder.com/800x400?text=Offer+3',
   ];
 
-  final List<Map<String, dynamic>> categories = [
+  final List<Map<String, dynamic>> categories = const [
     {'name': 'أجهزة', 'icon': Icons.device_hub},
     {'name': 'محاليل', 'icon': Icons.science},
     {'name': 'مستلزمات', 'icon': Icons.medical_services},
@@ -20,7 +22,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // مرجع قاعدة بيانات Firebase - مسار المنتجات
-    final DatabaseReference _productsRef =
+    final DatabaseReference productsRef =
         FirebaseDatabase.instance.ref().child('products');
 
     return Scaffold(
@@ -131,7 +133,7 @@ class HomeScreen extends StatelessWidget {
               height: 260,
               child: StreamBuilder(
                 stream:
-                    _productsRef.limitToLast(10).onValue, // جلب آخر 10 منتجات
+                    productsRef.limitToLast(10).onValue, // جلب آخر 10 منتجات
                 builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

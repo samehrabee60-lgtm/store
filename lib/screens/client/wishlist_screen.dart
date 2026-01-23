@@ -5,6 +5,8 @@ import '../../models/product_model.dart';
 import '../../widgets/product_card.dart';
 
 class WishlistScreen extends StatelessWidget {
+  const WishlistScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final user = AuthService().currentUser;
@@ -36,9 +38,8 @@ class WishlistScreen extends StatelessWidget {
               if (!productSnapshot.hasData) return SizedBox();
 
               final allProducts = productSnapshot.data!;
-              final wishlistProducts = allProducts
-                  .where((p) => wishlistIds.contains(p.id))
-                  .toList();
+              final wishlistProducts =
+                  allProducts.where((p) => wishlistIds.contains(p.id)).toList();
 
               if (wishlistProducts.isEmpty) {
                 return Center(

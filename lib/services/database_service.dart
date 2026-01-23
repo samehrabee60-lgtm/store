@@ -247,8 +247,9 @@ class DatabaseService {
 
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     final snapshot = await _getRef().child('users').child(uid).get();
-    if (snapshot.exists)
+    if (snapshot.exists) {
       return Map<String, dynamic>.from(snapshot.value as Map);
+    }
     return null;
   }
 

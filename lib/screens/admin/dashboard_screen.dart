@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../../services/database_service.dart';
 import 'add_edit_product_screen.dart';
 
@@ -7,7 +8,6 @@ class DashboardScreen extends StatelessWidget {
   // إضافة key المطلوب لتجنب أخطاء البناء
   const DashboardScreen({super.key});
 
-<<<<<<< HEAD
   // تحديد مرجع قاعدة البيانات الخاص بسيرفر سنغافورة لضمان جلب البيانات
   DatabaseReference _getDatabaseRef() {
     return FirebaseDatabase.instanceFor(
@@ -17,12 +17,11 @@ class DashboardScreen extends StatelessWidget {
     ).ref().child('products');
   }
 
-=======
->>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
   @override
   Widget build(BuildContext context) {
     // تعريف مرجع قاعدة البيانات بشكل صحيح
-    final DatabaseReference _databaseRef = FirebaseDatabase.instance.ref().child('products');
+    final DatabaseReference _databaseRef =
+        FirebaseDatabase.instance.ref().child('products');
 
     return Scaffold(
       appBar: AppBar(
@@ -31,9 +30,9 @@ class DashboardScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.push(
-              context, 
-              MaterialPageRoute(builder: (_) => const AddEditProductScreen())
-            ),
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AddEditProductScreen())),
           ),
         ],
       ),
@@ -43,18 +42,14 @@ class DashboardScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-<<<<<<< HEAD
 
           if (snapshot.hasError) {
             return Center(child: Text('حدث خطأ: ${snapshot.error}'));
           }
 
-=======
->>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
           if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
             return const Center(child: Text('لا توجد منتجات لتعديلها'));
           }
-<<<<<<< HEAD
 
           // تحويل البيانات الخام من Firebase إلى قائمة منتجات
           Map<dynamic, dynamic> values =
@@ -113,25 +108,11 @@ class DashboardScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-=======
-          
-          Map<dynamic, dynamic> data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-          List<dynamic> products = data.values.toList();
-          
-          return ListView.builder(
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(products[index]['name'] ?? ''),
-                subtitle: Text('${products[index]['price']} ج.م'),
-                trailing: const Icon(Icons.edit),
->>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
               );
             },
           );
         },
       ),
-<<<<<<< HEAD
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () {
@@ -175,8 +156,6 @@ class DashboardScreen extends StatelessWidget {
           ],
         );
       },
-=======
->>>>>>> df094a09f831d15687de47dc41bd9a53678acd36
     );
   }
 }

@@ -63,7 +63,7 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
   }
 
   void _showOtpDialog() {
-    final TextEditingController _otpController = TextEditingController();
+    final TextEditingController otpController = TextEditingController();
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -75,7 +75,7 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
             children: [
               Text('تم إرسال كود التحقق إلى ${_phoneController.text}'),
               TextField(
-                controller: _otpController,
+                controller: otpController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'أدخل الكود (6 أرقام)'),
               ),
@@ -90,9 +90,9 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (_otpController.text.isNotEmpty) {
+                if (otpController.text.isNotEmpty) {
                   Navigator.pop(context);
-                  _completeRegistration(_otpController.text.trim());
+                  _completeRegistration(otpController.text.trim());
                 }
               },
               child: Text('تأكيد'),
@@ -194,10 +194,12 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'الرجاء إدخال رقم الهاتف';
-                    if (!value.startsWith('+'))
+                    }
+                    if (!value.startsWith('+')) {
                       return 'يجب أن يبدأ الرقم بـ + (كود الدولة)';
+                    }
                     return null;
                   },
                 ),
@@ -224,10 +226,12 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'الرجاء إدخال كلمة المرور';
-                    if (value.length < 6)
+                    }
+                    if (value.length < 6) {
                       return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    }
                     return null;
                   },
                 ),
