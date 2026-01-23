@@ -75,8 +75,6 @@ class MyOrdersScreen extends StatelessWidget {
         return 'تم التسليم';
       case OrderStatus.cancelled:
         return 'ملغي';
-      default:
-        return 'غير معروف';
     }
   }
 
@@ -92,8 +90,6 @@ class MyOrdersScreen extends StatelessWidget {
         return Colors.green;
       case OrderStatus.cancelled:
         return Colors.red;
-      default:
-        return Colors.grey;
     }
   }
 }

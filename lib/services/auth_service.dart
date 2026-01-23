@@ -13,7 +13,7 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('Error signing in: $e');
+      // print('Error signing in: $e');
       rethrow; // Pass error to UI to show message
     }
   }
@@ -48,7 +48,7 @@ class AuthService {
 
       return result;
     } catch (e) {
-      print('Error registering user: $e');
+      // print('Error registering user: $e');
       rethrow;
     }
   }
@@ -134,7 +134,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print('Error registering user with phone: $e');
+      // print('Error registering user with phone: $e');
       rethrow;
     }
   }

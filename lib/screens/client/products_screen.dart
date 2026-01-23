@@ -4,8 +4,10 @@ import '../../widgets/product_card.dart';
 import '../../services/database_service.dart';
 
 class ProductsScreen extends StatefulWidget {
+  const ProductsScreen({super.key});
+
   @override
-  _ProductsScreenState createState() => _ProductsScreenState();
+  State<ProductsScreen> createState() => _ProductsScreenState();
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
@@ -31,8 +33,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
       temp = temp
           .where(
             (p) => p.name.toLowerCase().contains(
-              searchController.text.toLowerCase(),
-            ),
+                  searchController.text.toLowerCase(),
+                ),
           )
           .toList();
     }
@@ -88,7 +90,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Divider(),
-
                   Text('القسم', style: TextStyle(fontWeight: FontWeight.bold)),
                   Wrap(
                     spacing: 8,
@@ -105,7 +106,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     }).toList(),
                   ),
                   SizedBox(height: 20),
-
                   Text(
                     'نطاق السعر: ${_currentPriceRange.start.round()} - ${_currentPriceRange.end.round()}',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -126,7 +126,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     },
                   ),
                   SizedBox(height: 20),
-
                   Text(
                     'الترتيب',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -150,7 +149,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     },
                   ),
                   SizedBox(height: 30),
-
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -246,8 +244,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 // No, displayedProducts should be authoritative content.
                 // However, initial load issue: displayedProducts starts empty.
                 // Quick fix:
-                final productsToShow =
-                    displayedProducts.isEmpty &&
+                final productsToShow = displayedProducts.isEmpty &&
                         searchController.text.isEmpty &&
                         _selectedCategory == null
                     ? snapshot.data!

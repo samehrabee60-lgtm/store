@@ -4,6 +4,8 @@ import '../../services/database_service.dart';
 // import 'package:intl/intl.dart';
 
 class AdminOrdersScreen extends StatelessWidget {
+  const AdminOrdersScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

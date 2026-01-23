@@ -4,8 +4,10 @@ import '../../services/database_service.dart';
 import '../../widgets/app_drawer.dart';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -50,14 +52,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'name': _nameController.text.trim(),
             'phone': _phoneController.text.trim(),
           });
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('تم تحديث البيانات بنجاح')));
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('تم تحديث البيانات بنجاح')));
+          }
         }
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
+        }
       } finally {
         setState(() => _isLoading = false);
       }
@@ -108,39 +114,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
         currentPassword: _currentPasswordController.text,
         newPassword: _newPasswordController.text,
       );
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('تم تغيير كلمة المرور بنجاح')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('تم تغيير كلمة المرور بنجاح')));
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('فشل تغيير كلمة المرور: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('فشل تغيير كلمة المرور: $e')));
+      }
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
   void _showAddressDialog() {
-    final TextEditingController _addressController = TextEditingController();
+    final TextEditingController addressController = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('إضافة عنوان جديد'),
         content: TextField(
-          controller: _addressController,
+          controller: addressController,
           decoration: InputDecoration(labelText: 'العنوان بالتفصيل'),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('إلغاء')),
           ElevatedButton(
             onPressed: () async {
-              if (_addressController.text.isNotEmpty) {
+              if (addressController.text.isNotEmpty) {
                 Navigator.pop(ctx);
                 final user = AuthService().currentUser;
                 if (user != null) {
                   await DatabaseService().addAddress(
                     user.uid,
-                    _addressController.text,
+                    addressController.text,
                   );
                   setState(() {}); // Refresh list
                 }
@@ -207,9 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Text('حفظ التعديلات'),
                       ),
                     ),
-
                     Divider(height: 40),
-
                     Text(
                       'الأمان',
                       style: TextStyle(
@@ -223,9 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       trailing: Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: _showChangePasswordDialog,
                     ),
-
                     Divider(height: 40),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -242,7 +248,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ],
                     ),
-
                     StreamBuilder<List<String>>(
                       stream: DatabaseService().getUserAddresses(
                         AuthService().currentUser?.uid ?? '',

@@ -12,7 +12,8 @@ class DashboardScreen extends StatelessWidget {
   DatabaseReference _getDatabaseRef() {
     return FirebaseDatabase.instanceFor(
       app: Firebase.app(),
-      databaseURL: 'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/',
+      databaseURL:
+          'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/',
     ).ref().child('products');
   }
 
@@ -45,7 +46,7 @@ class DashboardScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (snapshot.hasError) {
             return Center(child: Text('حدث خطأ: ${snapshot.error}'));
           }
@@ -55,7 +56,8 @@ class DashboardScreen extends StatelessWidget {
           }
 
           // تحويل البيانات الخام من Firebase إلى قائمة منتجات
-          Map<dynamic, dynamic> values = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+          Map<dynamic, dynamic> values =
+              snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
           List<Product> products = [];
           values.forEach((key, value) {
             products.add(Product(
@@ -78,14 +80,15 @@ class DashboardScreen extends StatelessWidget {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Colors.grey[200],
-                    backgroundImage: product.imageUrl.isNotEmpty 
-                        ? NetworkImage(product.imageUrl) 
+                    backgroundImage: product.imageUrl.isNotEmpty
+                        ? NetworkImage(product.imageUrl)
                         : null,
-                    child: product.imageUrl.isEmpty 
-                        ? const Icon(Icons.shopping_bag, color: Colors.grey) 
+                    child: product.imageUrl.isEmpty
+                        ? const Icon(Icons.shopping_bag, color: Colors.grey)
                         : null,
                   ),
-                  title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(product.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('${product.price} ج.م - ${product.category}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -96,7 +99,8 @@ class DashboardScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddEditProductScreen(product: product),
+                              builder: (context) =>
+                                  AddEditProductScreen(product: product),
                             ),
                           );
                         },
@@ -118,7 +122,8 @@ class DashboardScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddEditProductScreen()),
+            MaterialPageRoute(
+                builder: (context) => const AddEditProductScreen()),
           );
         },
         tooltip: 'إضافة منتج جديد',

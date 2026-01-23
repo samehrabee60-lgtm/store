@@ -4,16 +4,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart'; // إضافة المكتبة
 import 'package:firebase_database/firebase_database.dart'; // إضافة المكتبة للتعامل مع السيرفر
 import '../../models/product_model.dart';
-import '../../services/database_service.dart';
 import '../../services/storage_service.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   final Product? product;
 
-  const AddEditProductScreen({Key? key, this.product}) : super(key: key);
+  const AddEditProductScreen({super.key, this.product});
 
   @override
-  _AddEditProductScreenState createState() => _AddEditProductScreenState();
+  State<AddEditProductScreen> createState() => _AddEditProductScreenState();
 }
 
 class _AddEditProductScreenState extends State<AddEditProductScreen> {
@@ -21,17 +20,18 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   String _selectedCategory = 'أجهزة';
   final List<String> _categories = ['أجهزة', 'محاليل', 'مستلزمات', 'أخرى'];
-  
+
   File? _imageFile;
   bool _isLoading = false;
 
   // تعريف مرجع قاعدة البيانات الخاص بسيرفر سنغافورة
   final DatabaseReference _dbRef = FirebaseDatabase.instanceFor(
     app: Firebase.app(),
-    databaseURL: 'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    databaseURL:
+        'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/',
   ).ref().child('products');
 
   @override
@@ -65,7 +65,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
 
       try {
         String imageUrl = widget.product?.imageUrl ?? '';
-        
+
         // 2. رفع الصورة إذا تم اختيار صورة جديدة
         if (_imageFile != null) {
           final url = await StorageService().uploadImage(_imageFile!);
@@ -140,11 +140,13 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   child: _imageFile != null
                       ? Image.file(_imageFile!, fit: BoxFit.cover)
                       : (widget.product?.imageUrl.isNotEmpty ?? false)
-                          ? Image.network(widget.product!.imageUrl, fit: BoxFit.cover)
+                          ? Image.network(widget.product!.imageUrl,
+                              fit: BoxFit.cover)
                           : const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add_a_photo, size: 50, color: Colors.grey),
+                                Icon(Icons.add_a_photo,
+                                    size: 50, color: Colors.grey),
                                 Text('اضغط لاختيار صورة'),
                               ],
                             ),
@@ -157,11 +159,12 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   labelText: 'اسم المنتج',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value!.isEmpty ? 'الرجاء إدخال اسم المنتج' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'الرجاء إدخال اسم المنتج' : null,
               ),
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'الفئة',
                   border: OutlineInputBorder(),
@@ -189,7 +192,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value!.isEmpty) return 'الرجاء إدخال السعر';
-                  if (double.tryParse(value) == null) return 'الرجاء إدخال رقم صحيح';
+                  if (double.tryParse(value) == null)
+                    return 'الرجاء إدخال رقم صحيح';
                   return null;
                 },
               ),
@@ -201,7 +205,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
-                validator: (value) => value!.isEmpty ? 'الرجاء إدخال الوصف' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'الرجاء إدخال الوصف' : null,
               ),
               const SizedBox(height: 30),
               ElevatedButton(
@@ -213,9 +218,10 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: _isLoading 
+                  child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('حفظ المنتج', style: TextStyle(fontSize: 18)),
+                      : const Text('حفظ المنتج',
+                          style: TextStyle(fontSize: 18)),
                 ),
               ),
             ],

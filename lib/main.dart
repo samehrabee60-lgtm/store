@@ -19,12 +19,12 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // تهيئة Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // تحديث هام: ربط التطبيق بسيرفر سنغافورة الخاص بك لتفعيل الإضافة والتعديل
-  FirebaseDatabase.instance.databaseURL = 
+  FirebaseDatabase.instance.databaseURL =
       "https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
   runApp(const MyApp());
@@ -59,14 +59,14 @@ class MyApp extends StatelessWidget {
       routes: {
         '/products': (context) => const ProductsScreen(),
         '/about': (context) => const AboutScreen(),
-        '/admin-login': (context) => const LoginScreen(),
+        '/admin-login': (context) => LoginScreen(),
         '/admin-dashboard': (context) => const DashboardScreen(),
         '/edit-company-info': (context) => const EditCompanyInfoScreen(),
-        '/client-login': (context) => const ClientLoginScreen(),
-        '/client-register': (context) => const ClientRegisterScreen(),
+        '/client-login': (context) => ClientLoginScreen(),
+        '/client-register': (context) => ClientRegisterScreen(),
         '/cart': (context) => const CartScreen(),
         '/wishlist': (context) => const WishlistScreen(),
-        '/orders': (context) => const MyOrdersScreen(),
+        '/orders': (context) => MyOrdersScreen(),
         '/admin-orders': (context) => const AdminOrdersScreen(),
         '/profile': (context) => const ProfileScreen(),
       },

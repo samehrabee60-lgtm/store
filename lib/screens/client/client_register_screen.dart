@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 
 class ClientRegisterScreen extends StatefulWidget {
+  const ClientRegisterScreen({super.key});
+
   @override
-  _ClientRegisterScreenState createState() => _ClientRegisterScreenState();
+  State<ClientRegisterScreen> createState() => _ClientRegisterScreenState();
 }
 
 class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
@@ -12,10 +14,10 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+
   String? _verificationId;
   // --- الإصلاح هنا: تعريف متغير حالة التحميل ---
-  bool _isLoading = false; 
+  bool _isLoading = false;
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
@@ -37,9 +39,11 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
             setState(() {
               _isLoading = false;
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('فشل التحقق من الهاتف: ${e.message}')),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('فشل التحقق من الهاتف: ${e.message}')),
+              );
+            }
           },
           onCodeAutoRetrievalTimeout: (verificationId) {
             _verificationId = verificationId;
@@ -49,9 +53,11 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('حدث خطأ: $e')),
+          );
+        }
       }
     }
   }
@@ -118,18 +124,24 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم إنشاء الحساب بنجاح')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم إنشاء الحساب بنجاح')),
+        );
+      }
 
-      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل التسجيل: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل التسجيل: $e')),
+        );
+      }
     }
   }
 
@@ -167,7 +179,9 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person),
                   ),
-                  validator: (value) => value == null || value.isEmpty ? 'الرجاء إدخال الاسم' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'الرجاء إدخال الاسم'
+                      : null,
                 ),
                 SizedBox(height: 20),
                 TextFormField(
@@ -180,8 +194,10 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'الرجاء إدخال رقم الهاتف';
-                    if (!value.startsWith('+')) return 'يجب أن يبدأ الرقم بـ + (كود الدولة)';
+                    if (value == null || value.isEmpty)
+                      return 'الرجاء إدخال رقم الهاتف';
+                    if (!value.startsWith('+'))
+                      return 'يجب أن يبدأ الرقم بـ + (كود الدولة)';
                     return null;
                   },
                 ),
@@ -194,7 +210,9 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                     prefixIcon: Icon(Icons.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) => value == null || value.isEmpty ? 'الرجاء إدخال البريد الإلكتروني' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'الرجاء إدخال البريد الإلكتروني'
+                      : null,
                 ),
                 SizedBox(height: 20),
                 TextFormField(
@@ -206,8 +224,10 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'الرجاء إدخال كلمة المرور';
-                    if (value.length < 6) return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    if (value == null || value.isEmpty)
+                      return 'الرجاء إدخال كلمة المرور';
+                    if (value.length < 6)
+                      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
                     return null;
                   },
                 ),
@@ -221,7 +241,8 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                         ? SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
                           )
                         : Text('تحقق وإنشاء حساب'),
                   ),

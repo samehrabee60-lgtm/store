@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 
 class ClientLoginScreen extends StatefulWidget {
+  const ClientLoginScreen({super.key});
+
   @override
-  _ClientLoginScreenState createState() => _ClientLoginScreenState();
+  State<ClientLoginScreen> createState() => _ClientLoginScreenState();
 }
 
 class _ClientLoginScreenState extends State<ClientLoginScreen> {
@@ -28,15 +30,20 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
           _isLoading = false;
         });
 
-        // Navigate to Home layout and remove all previous routes to clean slate
-        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        }
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل تسجيل الدخول: تأكد من البيانات المدخلة')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('فشل تسجيل الدخول: تأكد من البيانات المدخلة'),
+            ),
+          );
+        }
       }
     }
   }

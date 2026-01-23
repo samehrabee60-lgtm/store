@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/database_service.dart';
 import '../../widgets/app_drawer.dart';
 
 class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,14 +21,15 @@ class AboutScreen extends StatelessWidget {
         centerTitle: true,
       ),
       drawer: AppDrawer(),
-      body: StreamBuilder<DocumentSnapshot>(
+      body: StreamBuilder<DatabaseEvent>(
         stream: DatabaseService().companyInfoStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
-          final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+          final data =
+              (snapshot.data!.snapshot.value as Map<dynamic, dynamic>?) ?? {};
 
           final String aboutText =
               data['about'] ?? 'شركة بيتا لاب للمستلزمات الطبية...';
