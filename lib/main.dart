@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart'; // إضافة مكتبة قاعدة البيانات
@@ -19,19 +20,41 @@ import 'firebase_options.dart';
 import 'services/database_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // تهيئة Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    try {
+      // تهيئة Firebase
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
-  // تحديث هام: ربط التطبيق بسيرفر سنغافورة الخاص بك لتفعيل الإضافة والتعديل
-  FirebaseDatabase.instance.databaseURL =
-      "https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/";
+      // اختبار الاتصال عند بدء التشغيل
+      DatabaseService().testConnection();
 
-  // اختبار الاتصال عند بدء التشغيل
-  DatabaseService().testConnection();
-
-  runApp(const MyApp());
+      runApp(const MyApp());
+    } catch (e, stack) {
+      print("Error during app initialization: $e");
+      print(stack);
+      // يمكن هنا تشغيل تطبيق بديل يعرض رسالة الخطأ
+      runApp(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: Text(
+                'حدث خطأ أثناء تشغيل التطبيق:\n$e',
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }, (error, stack) {
+    print("Uncaught error: $error");
+    print(stack);
+  });
 }
 
 class MyApp extends StatelessWidget {

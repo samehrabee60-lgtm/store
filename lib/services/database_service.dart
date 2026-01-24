@@ -15,13 +15,19 @@ class DatabaseService {
 
   // دالة لاختبار الاتصال
   void testConnection() {
-    _getRef().child(".info/connected").onValue.listen((event) {
-      if (event.snapshot.value == true) {
-        print("✅ اتصال بقاعدة البيانات ناجح!");
-      } else {
-        print("❌ غير متصل بقاعدة البيانات.");
-      }
-    });
+    try {
+      _getRef().child(".info/connected").onValue.listen((event) {
+        if (event.snapshot.value == true) {
+          print("✅ اتصال بقاعدة البيانات ناجح!");
+        } else {
+          print("❌ غير متصل بقاعدة البيانات.");
+        }
+      }, onError: (error) {
+        print("Error in connection listener: $error");
+      });
+    } catch (e) {
+      print("Error initializing connection test: $e");
+    }
   }
 
   // --- إدارة المنتجات (Products) ---
