@@ -27,8 +27,16 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   File? _imageFile;
   bool _isLoading = false;
 
-  // استخدام المرجع العام الذي تم تهيئته في main.dart
-  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref().child('products');
+  // 1. رابط قاعدة البيانات الخاص بسيرفر سنغافورة
+  final String _databaseURL =
+      'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/';
+
+  DatabaseReference get _dbRef {
+    return FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: _databaseURL,
+    ).ref().child('products');
+  }
 
   @override
   void initState() {
@@ -68,6 +76,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
               .timeout(const Duration(seconds: 30));
           if (url != null) {
             imageUrl = url;
+          } else {
+            throw 'فشل رفع الصورة. يرجى المحاولة مرة أخرى.';
           }
         }
 

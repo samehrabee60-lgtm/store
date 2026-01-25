@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart'; // إضافة مكتبة قاعدة البيانات
 import 'screens/client/home_screen.dart';
@@ -95,7 +96,26 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Cairo',
       ),
-      home: const HomeScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (snapshot.hasData && snapshot.data != null) {
+            // Check if admin email
+            if (snapshot.data!.email == 'sameh.rabee007@gmail.com') {
+              return const DashboardScreen();
+            }
+            // Otherwise go to home (client logged in)
+            return const HomeScreen();
+          }
+          // Not logged in
+          return const HomeScreen();
+        },
+      ),
       routes: {
         '/products': (context) => const ProductsScreen(),
         '/about': (context) => const AboutScreen(),

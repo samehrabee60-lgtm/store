@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_database/firebase_database.dart'; // إضافة مكتبة Firebase
+import 'package:firebase_core/firebase_core.dart';
 import '../../widgets/app_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -22,8 +23,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // مرجع قاعدة بيانات Firebase - مسار المنتجات
-    final DatabaseReference productsRef =
-        FirebaseDatabase.instance.ref().child('products');
+    final DatabaseReference productsRef = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL:
+          'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    ).ref().child('products');
 
     return Scaffold(
       appBar: AppBar(

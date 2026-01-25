@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../models/product_model.dart';
 import '../models/order_model.dart';
 import '../models/cart_model.dart';
@@ -10,7 +11,10 @@ class DatabaseService {
       'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/';
 
   DatabaseReference _getRef() {
-    return FirebaseDatabase.instance.refFromURL(_databaseURL);
+    return FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: _databaseURL,
+    ).ref();
   }
 
   // دالة لاختبار الاتصال

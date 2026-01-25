@@ -21,13 +21,18 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // تعريف مرجع قاعدة البيانات بشكل صحيح
-    final DatabaseReference databaseRef =
-        FirebaseDatabase.instance.ref().child('products');
+    // تعريف مرجع قاعدة البيانات بشكل صحيح
+    final DatabaseReference databaseRef = _getDatabaseRef();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('لوحة التحكم - Beta Lab'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+            tooltip: 'الرئيسية',
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => Navigator.push(
