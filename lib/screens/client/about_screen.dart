@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import '../../services/database_service.dart';
 import '../../widgets/app_drawer.dart';
 
@@ -22,15 +22,14 @@ class AboutScreen extends StatelessWidget {
         centerTitle: true,
       ),
       drawer: AppDrawer(),
-      body: StreamBuilder<DatabaseEvent>(
-        stream: DatabaseService().companyInfoStream,
+      body: FutureBuilder<Map<String, dynamic>?>(
+        future: DatabaseService().getCompanyInfo(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
-          final data =
-              (snapshot.data!.snapshot.value as Map<dynamic, dynamic>?) ?? {};
+          final data = snapshot.data ?? {};
 
           final String aboutText =
               data['about'] ?? 'شركة بيتا لاب للمستلزمات الطبية...';

@@ -1,5 +1,5 @@
 import 'cart_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum OrderStatus { pending, processing, shipped, delivered, cancelled }
 
@@ -31,7 +31,7 @@ class OrderModel {
       'items': items.map((item) => item.toMap()).toList(),
       'totalAmount': totalAmount,
       'status': status.toString().split('.').last, // Store as string
-      'date': Timestamp.fromDate(date),
+      'date': date.toIso8601String(), // Supabase uses ISO string
       'address': address,
     };
   }
@@ -51,7 +51,7 @@ class OrderModel {
         (e) => e.toString().split('.').last == map['status'],
         orElse: () => OrderStatus.pending,
       ),
-      date: (map['date'] as Timestamp).toDate(),
+      date: DateTime.tryParse(map['date']?.toString() ?? '') ?? DateTime.now(),
       address: map['address'] ?? '',
     );
   }

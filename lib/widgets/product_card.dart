@@ -51,7 +51,7 @@ class ProductCard extends StatelessWidget {
                       right: 5,
                       child: StreamBuilder<List<String>>(
                         stream: DatabaseService().getWishlist(
-                          AuthService().currentUser?.uid ?? '',
+                          AuthService().currentUser?.id ?? '',
                         ),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) return SizedBox();
@@ -70,7 +70,7 @@ class ProductCard extends StatelessWidget {
                                 final user = AuthService().currentUser;
                                 if (user != null) {
                                   DatabaseService().toggleWishlist(
-                                    user.uid,
+                                    user.id,
                                     product.id,
                                   );
                                 } else {

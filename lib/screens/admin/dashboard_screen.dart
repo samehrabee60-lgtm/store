@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_core/firebase_core.dart';
 
 import 'add_edit_product_screen.dart';
 import '../../models/product_model.dart';
+import '../../services/database_service.dart';
 
 class DashboardScreen extends StatelessWidget {
   // إضافة key المطلوب لتجنب أخطاء البناء
   const DashboardScreen({super.key});
 
-  // تحديد مرجع قاعدة البيانات الخاص بسيرفر سنغافورة لضمان جلب البيانات
-  DatabaseReference _getDatabaseRef() {
-    return FirebaseDatabase.instanceFor(
-      app: Firebase.app(),
-      databaseURL:
-          'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/',
-    ).ref().child('products');
-  }
-
   @override
   Widget build(BuildContext context) {
-    // تعريف مرجع قاعدة البيانات بشكل صحيح
-    // تعريف مرجع قاعدة البيانات بشكل صحيح
-    final DatabaseReference databaseRef = _getDatabaseRef();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('لوحة التحكم - Beta Lab'),
         actions: [
           IconButton(
             icon: const Icon(Icons.home),
-            onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+            onPressed: () => Navigator.pushNamed(context, '/home'),
             tooltip: 'الرئيسية',
           ),
           IconButton(
@@ -42,9 +30,9 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder(
-        stream: databaseRef.onValue,
-        builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+      body: StreamBuilder<List<Product>>(
+        stream: DatabaseService().products,
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -53,24 +41,11 @@ class DashboardScreen extends StatelessWidget {
             return Center(child: Text('حدث خطأ: ${snapshot.error}'));
           }
 
-          if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('لا توجد منتجات لتعديلها'));
           }
 
-          // تحويل البيانات الخام من Firebase إلى قائمة منتجات
-          Map<dynamic, dynamic> values =
-              snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-          List<Product> products = [];
-          values.forEach((key, value) {
-            products.add(Product(
-              id: key,
-              name: value['name'] ?? '',
-              category: value['category'] ?? '',
-              price: (value['price'] ?? 0).toDouble(),
-              description: value['description'] ?? '',
-              imageUrl: value['imageUrl'] ?? '',
-            ));
-          });
+          final products = snapshot.data!;
 
           return ListView.builder(
             itemCount: products.length,
@@ -150,7 +125,7 @@ class DashboardScreen extends StatelessWidget {
             TextButton(
               child: const Text('حذف', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                await _getDatabaseRef().child(product.id).remove();
+                await DatabaseService().deleteProduct(product.id);
                 if (context.mounted) Navigator.of(context).pop();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

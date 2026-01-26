@@ -21,8 +21,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
   String _sortOrder = 'newest'; // newest, priceAsc, priceDesc
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is String && _selectedCategory == null) {
+      _selectedCategory = args;
+    }
   }
 
   void _applyFilters() {

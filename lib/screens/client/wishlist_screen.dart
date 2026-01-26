@@ -21,7 +21,7 @@ class WishlistScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('المفضلة')),
       body: StreamBuilder<List<String>>(
-        stream: DatabaseService().getWishlist(user.uid),
+        stream: DatabaseService().getWishlist(user.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

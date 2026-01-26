@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/database_service.dart';
 
 class EditCompanyInfoScreen extends StatefulWidget {
@@ -26,13 +26,8 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
   }
 
   void _loadData() async {
-    // We can just listen to the stream locally or fetch once. Fetch once is fine for edit form.
-    final doc = await FirebaseFirestore.instance
-        .collection('settings')
-        .doc('company_info')
-        .get();
-    if (doc.exists) {
-      final data = doc.data() as Map<String, dynamic>;
+    final data = await DatabaseService().getCompanyInfo();
+    if (data != null) {
       _aboutController.text = data['about'] ?? '';
       _facebookController.text = data['facebook'] ?? '';
       _phoneController.text = data['phone'] ?? '';

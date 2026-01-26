@@ -15,7 +15,7 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  String? _verificationId;
+  // String? _verificationId; // Removed
   // --- الإصلاح هنا: تعريف متغير حالة التحميل ---
   bool _isLoading = false;
 
@@ -26,128 +26,46 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
       });
 
       try {
-        await AuthService().verifyPhoneNumber(
-          phoneNumber: _phoneController.text.trim(),
-          onCodeSent: (verificationId, resendToken) {
-            setState(() {
-              _isLoading = false;
-              _verificationId = verificationId;
-            });
-            _showOtpDialog();
-          },
-          onVerificationFailed: (e) {
-            setState(() {
-              _isLoading = false;
-            });
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('فشل التحقق من الهاتف: ${e.message}')),
-              );
-            }
-          },
-          onCodeAutoRetrievalTimeout: (verificationId) {
-            _verificationId = verificationId;
-          },
-        );
+        await AuthService().registerUser(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          name: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+        ).timeout(const Duration(seconds: 90));
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تم إنشاء الحساب بنجاح')),
+          );
+          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        }
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
         if (mounted) {
+          String errorMessage = 'فشل التسجيل: $e';
+          if (e.toString().contains('TimeoutException')) {
+            errorMessage = 'انتهت مهلة الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.';
+          }
+          // Friendly error for existing user
+          if (e.toString().contains('User already registered')) {
+            errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل';
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('حدث خطأ: $e')),
+            SnackBar(content: Text(errorMessage)),
           );
         }
       }
     }
   }
 
-  void _showOtpDialog() {
-    final TextEditingController otpController = TextEditingController();
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('التحقق من رقم الهاتف'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('تم إرسال كود التحقق إلى ${_phoneController.text}'),
-              TextField(
-                controller: otpController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'أدخل الكود (6 أرقام)'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('إلغاء'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (otpController.text.isNotEmpty) {
-                  Navigator.pop(context);
-                  _completeRegistration(otpController.text.trim());
-                }
-              },
-              child: Text('تأكيد'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _completeRegistration(String smsCode) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (_verificationId == null) throw 'OTP Verification ID missing';
-
-      await AuthService().registerUserWithPhoneAndEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        name: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        verificationId: _verificationId!,
-        smsCode: smsCode,
-      ).timeout(const Duration(seconds: 30));
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إنشاء الحساب بنجاح')),
-        );
-      }
-
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        String errorMessage = 'فشل التسجيل: $e';
-        if (e.toString().contains('TimeoutException')) {
-          errorMessage = 'انتهت مهلة الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
-    }
-  }
+  // _showOtpDialog and _completeRegistration removed as per user request to skip phone verification
 
   @override
   Widget build(BuildContext context) {

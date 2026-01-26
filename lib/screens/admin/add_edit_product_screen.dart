@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_core/firebase_core.dart'; // إضافة المكتبة
-import 'package:firebase_database/firebase_database.dart'; // إضافة المكتبة للتعامل مع السيرفر
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import '../../models/product_model.dart';
 import '../../services/storage_service.dart';
+import '../../services/database_service.dart';
 
 class AddEditProductScreen extends StatefulWidget {
   final Product? product;
@@ -24,19 +26,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   String _selectedCategory = 'أجهزة';
   final List<String> _categories = ['أجهزة', 'محاليل', 'مستلزمات', 'أخرى'];
 
-  File? _imageFile;
+  XFile? _imageFile; // Changed to XFile
   bool _isLoading = false;
-
-  // 1. رابط قاعدة البيانات الخاص بسيرفر سنغافورة
-  final String _databaseURL =
-      'https://betalab-beta-lab-store-default-rtdb.asia-southeast1.firebasedatabase.app/';
-
-  DatabaseReference get _dbRef {
-    return FirebaseDatabase.instanceFor(
-      app: Firebase.app(),
-      databaseURL: _databaseURL,
-    ).ref().child('products');
-  }
 
   @override
   void initState() {
@@ -55,7 +46,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
 
     if (pickedFile != null) {
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _imageFile = pickedFile; // Store as XFile directly
       });
     }
   }
@@ -73,7 +64,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         if (_imageFile != null) {
           final url = await StorageService()
               .uploadImage(_imageFile!)
-              .timeout(const Duration(seconds: 30));
+              .timeout(const Duration(seconds: 90));
           if (url != null) {
             imageUrl = url;
           } else {
@@ -81,24 +72,24 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
           }
         }
 
-        final productData = {
-          'name': _nameController.text,
-          'category': _selectedCategory,
-          'price': double.tryParse(_priceController.text) ?? 0.0,
-          'description': _descriptionController.text,
-          'imageUrl': imageUrl,
-          'updatedAt': ServerValue.timestamp,
-        };
+        final product = Product(
+          id: widget.product?.id ?? '', // ID handled by service/DB for new items
+          name: _nameController.text,
+          category: _selectedCategory,
+          price: double.tryParse(_priceController.text) ?? 0.0,
+          description: _descriptionController.text,
+          imageUrl: imageUrl,
+        );
 
         // اضافة مهلة زمنية (timeout) لعملية الحفظ
         Future<void> saveFuture;
         if (widget.product == null) {
-          saveFuture = _dbRef.push().set(productData);
+          saveFuture = DatabaseService().addProduct(product);
         } else {
-          saveFuture = _dbRef.child(widget.product!.id).update(productData);
+          saveFuture = DatabaseService().updateProduct(product);
         }
 
-        await saveFuture.timeout(const Duration(seconds: 30));
+        await saveFuture.timeout(const Duration(seconds: 90));
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -149,7 +140,9 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: _imageFile != null
-                      ? Image.file(_imageFile!, fit: BoxFit.cover)
+                      ? (kIsWeb
+                          ? Image.network(_imageFile!.path, fit: BoxFit.cover)
+                          : Image.file(File(_imageFile!.path), fit: BoxFit.cover))
                       : (widget.product?.imageUrl.isNotEmpty ?? false)
                           ? Image.network(widget.product!.imageUrl,
                               fit: BoxFit.cover)

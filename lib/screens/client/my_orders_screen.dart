@@ -21,7 +21,7 @@ class MyOrdersScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('طلباتي')),
       body: StreamBuilder<List<OrderModel>>(
-        stream: DatabaseService().getUserOrders(user.uid),
+        stream: DatabaseService().getUserOrders(user.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

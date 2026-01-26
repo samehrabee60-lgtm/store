@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart'; // إضافة مكتبة قاعدة البيانات
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_database/firebase_database.dart';
+import 'services/supabase_service.dart';
 import 'screens/client/home_screen.dart';
 import 'screens/client/products_screen.dart';
 import 'screens/client/about_screen.dart';
@@ -17,15 +18,20 @@ import 'screens/client/my_orders_screen.dart';
 import 'screens/admin/admin_orders_screen.dart';
 import 'screens/client/profile_screen.dart';
 
-import 'firebase_options.dart';
+// import 'firebase_options.dart';
 import 'services/database_service.dart';
+import 'services/supabase_service.dart';
 
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     try {
-      // تهيئة Firebase
+      // تهيئة Supabase
+      await SupabaseService.initialize();
+
+      // تهيئة Firebase (تم إزالته)
+      /*
       try {
         if (Firebase.apps.isEmpty) {
           await Firebase.initializeApp(
@@ -42,6 +48,7 @@ void main() async {
           rethrow;
         }
       }
+      */
 
       // اختبار الاتصال عند بدء التشغيل
       DatabaseService().testConnection();
@@ -96,17 +103,18 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Cairo',
       ),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
+      home: StreamBuilder( // Removed <AuthState> to avoid type error
+        stream: SupabaseService.client.auth.onAuthStateChange,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          if (snapshot.hasData && snapshot.data != null) {
+          final session = SupabaseService.client.auth.currentSession;
+          if (session != null) {
             // Check if admin email
-            if (snapshot.data!.email == 'sameh.rabee007@gmail.com') {
+            if (session.user.email == 'sameh.rabee007@gmail.com') {
               return const DashboardScreen();
             }
             // Otherwise go to home (client logged in)
@@ -129,6 +137,7 @@ class MyApp extends StatelessWidget {
         '/orders': (context) => MyOrdersScreen(),
         '/admin-orders': (context) => const AdminOrdersScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/home': (context) => const HomeScreen(),
       },
     );
   }

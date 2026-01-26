@@ -1,20 +1,45 @@
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
-
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'supabase_service.dart';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final SupabaseClient _client = SupabaseService.client;
+  final String _bucketName = 'products'; // Must ensure this bucket exists
 
   // Upload image
-  Future<String?> uploadImage(File file) async {
-    String fileName = file.path.split(Platform.pathSeparator).last;
-    String destination =
-        'product_images/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+  Future<String?> uploadImage(dynamic file) async {
+    print('DEBUG: Starting uploadImage (Supabase)...');
+    try {
+      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      String path = fileName; // Path inside the bucket
 
-    Reference ref = _storage.ref().child(destination);
-    UploadTask uploadTask = ref.putFile(file);
-    TaskSnapshot snapshot = await uploadTask;
-    return await snapshot.ref.getDownloadURL();
+      if (kIsWeb) {
+        print('DEBUG: Reading file as bytes for Web...');
+        final bytes = await file.readAsBytes();
+        print('DEBUG: Read ${bytes.length} bytes. uploading...');
+        
+        await _client.storage.from(_bucketName).uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+        );
+      } else {
+        print('DEBUG: Uploading file for Mobile/Desktop...');
+        await _client.storage.from(_bucketName).upload(
+          path,
+          file,
+          fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+        );
+      }
+
+      print('DEBUG: Upload complete. Getting public URL...');
+      final String publicUrl = _client.storage.from(_bucketName).getPublicUrl(path);
+      print('DEBUG: Got public URL: $publicUrl');
+      return publicUrl;
+    } catch (e) {
+      print('DEBUG: Error in uploadImage: $e');
+      rethrow;
+    }
   }
 }

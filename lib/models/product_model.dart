@@ -33,7 +33,7 @@ class Product {
       category: map['category'] ?? '',
       price: (map['price'] ?? 0.0).toDouble(),
       description: map['description'] ?? '',
-      imageUrl: map['imageUrl'] ?? '',
+      imageUrl: map['image_url'] ?? map['imageUrl'] ?? '',
     );
   }
 }

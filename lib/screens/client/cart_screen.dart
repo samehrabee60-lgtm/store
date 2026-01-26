@@ -34,7 +34,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('سلة الشراء')),
       body: StreamBuilder<List<CartItem>>(
-        stream: DatabaseService().getCart(user.uid),
+        stream: DatabaseService().getCart(user.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -98,7 +98,7 @@ class CartScreen extends StatelessWidget {
                               ),
                               onPressed: () {
                                 DatabaseService().updateCartItemQuantity(
-                                  user.uid,
+                                  user.id,
                                   item.productId,
                                   item.quantity - 1,
                                 );
@@ -109,7 +109,7 @@ class CartScreen extends StatelessWidget {
                               icon: Icon(Icons.add_circle, color: Colors.green),
                               onPressed: () {
                                 DatabaseService().updateCartItemQuantity(
-                                  user.uid,
+                                  user.id,
                                   item.productId,
                                   item.quantity + 1,
                                 );
@@ -119,7 +119,7 @@ class CartScreen extends StatelessWidget {
                               icon: Icon(Icons.delete, color: Colors.grey),
                               onPressed: () {
                                 DatabaseService().removeFromCart(
-                                  user.uid,
+                                  user.id,
                                   item.productId,
                                 );
                               },

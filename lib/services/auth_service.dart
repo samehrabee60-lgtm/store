@@ -1,92 +1,81 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'supabase_service.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoTrueClient _auth = SupabaseService.client.auth;
+  final SupabaseClient _client = SupabaseService.client;
 
   // Sign in with email and password
-  Future<UserCredential?> signInWithEmail(String email, String password) async {
+  Future<AuthResponse> signInWithEmail(String email, String password) async {
     try {
-      return await _auth.signInWithEmailAndPassword(
+      return await _auth.signInWithPassword(
         email: email,
         password: password,
       );
     } catch (e) {
-      // print('Error signing in: $e');
-      rethrow; // Pass error to UI to show message
-    }
-  }
-
-  // Register with email, password, and additional details
-  Future<UserCredential?> registerUser({
-    required String email,
-    required String password,
-    required String name,
-    required String phone,
-  }) async {
-    try {
-      // Create user in Firebase Auth
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      User? user = result.user;
-
-      if (user != null) {
-        // Save user details in Firestore
-        await _firestore.collection('users').doc(user.uid).set({
-          'uid': user.uid,
-          'name': name,
-          'email': email,
-          'phone': phone,
-          'role': 'client', // Default role
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-      }
-
-      return result;
-    } catch (e) {
-      // print('Error registering user: $e');
       rethrow;
     }
   }
 
-  // Verify Phone Number
+  // Register with email, password, and additional details
+  Future<AuthResponse> registerUser({
+    required String email,
+    required String password,
+    required String name,
+    required String phone,
+  }) async {
+    try {
+      // Create user in Supabase Auth
+      AuthResponse response = await _auth.signUp(
+        email: email,
+        password: password,
+        data: {
+          'name': name,
+          'phone': phone,
+          'role': 'client',
+        },
+      );
+
+      // Save user details in 'profiles' table (optional if handled by triggers)
+      // Here we explicitly insert it to ensure it exists
+      if (response.user != null) {
+        await _client.from('profiles').insert({
+          'id': response.user!.id,
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'role': 'client',
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      }
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Verify Phone Number (Supabase uses OTP)
+  // This is a placeholder as Supabase verify works differently (signInWithOtp)
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
     required Function(String, int?) onCodeSent,
-    required Function(FirebaseAuthException) onVerificationFailed,
+    required Function(dynamic) onVerificationFailed,
     required Function(String) onCodeAutoRetrievalTimeout,
   }) async {
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        // Auto-resolution (Android only)
-        // We typically don't sign in automatically here for this flow
-        // because we want to link email/pass, but we can store it.
-      },
-      verificationFailed: onVerificationFailed,
-      codeSent: onCodeSent,
-      codeAutoRetrievalTimeout: onCodeAutoRetrievalTimeout,
-      timeout: const Duration(seconds: 60),
-    );
-  }
-
-  // Create PhoneAuthCredential from SMS Code
-  PhoneAuthCredential getPhoneCredential({
-    required String verificationId,
-    required String smsCode,
-  }) {
-    return PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
+    try {
+      await _auth.signInWithOtp(phone: phoneNumber);
+      // Simulate code sent for existing UI compatibility
+      // In reality, Supabase just sends the SMS.
+      onCodeSent('dummy_verification_id', null);
+    } catch (e) {
+      onVerificationFailed(e);
+    }
   }
 
   // Register User with Phone Verification and Email/Password
-  Future<UserCredential?> registerUserWithPhoneAndEmail({
+  // Adapting to Supabase: Link email/password to phone user or just update profile
+  Future<AuthResponse?> registerUserWithPhoneAndEmail({
     required String email,
     required String password,
     required String name,
@@ -95,46 +84,41 @@ class AuthService {
     required String smsCode,
   }) async {
     try {
-      // 1. Create Phone Credential
-      PhoneAuthCredential phoneCredential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
+      // 1. Verify Phone OTP
+      AuthResponse phoneResponse = await _auth.verifyOTP(
+        type: OtpType.sms,
+        token: smsCode,
+        phone: phone,
       );
 
-      // 2. Sign in with Phone first (to verify ownership)
-      UserCredential phoneUserCredential = await _auth.signInWithCredential(
-        phoneCredential,
-      );
-      User? tempUser = phoneUserCredential.user;
-
-      if (tempUser != null) {
-        // 3. Link Email/Password Credential
-        AuthCredential emailCredential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
+      if (phoneResponse.user != null) {
+        // 2. Update user with email and password
+        await _auth.updateUser(
+          UserAttributes(
+            email: email,
+            password: password,
+            data: {
+              'name': name,
+              'phone': phone,
+              'role': 'client',
+            },
+          ),
         );
 
-        UserCredential finalCredential = await tempUser.linkWithCredential(
-          emailCredential,
-        );
-        User? finalUser = finalCredential.user;
-
-        if (finalUser != null) {
-          // 4. Save user details in Firestore
-          await _firestore.collection('users').doc(finalUser.uid).set({
-            'uid': finalUser.uid,
-            'name': name,
-            'email': email,
-            'phone': phone,
-            'role': 'client',
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-          return finalCredential;
-        }
+        // 3. Create Profile
+        await _client.from('profiles').upsert({
+          'id': phoneResponse.user!.id,
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'role': 'client',
+          'created_at': DateTime.now().toIso8601String(),
+        });
+        
+        return phoneResponse;
       }
       return null;
     } catch (e) {
-      // print('Error registering user with phone: $e');
       rethrow;
     }
   }
@@ -144,16 +128,8 @@ class AuthService {
     required String currentPassword,
     required String newPassword,
   }) async {
-    User? user = _auth.currentUser;
-    if (user != null && user.email != null) {
-      // Re-authenticate first
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: user.email!,
-        password: currentPassword,
-      );
-      await user.reauthenticateWithCredential(credential);
-      await user.updatePassword(newPassword);
-    }
+    // Supabase allows password update directly if logged in
+    await _auth.updateUser(UserAttributes(password: newPassword));
   }
 
   // Sign out
@@ -165,5 +141,5 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
 
   // Stream of auth changes
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<AuthState> get authStateChanges => _auth.onAuthStateChange;
 }

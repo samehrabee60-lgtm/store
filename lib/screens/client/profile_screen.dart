@@ -32,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user != null) {
       _email = user.email;
       // Fetch fresh data from Firestore
-      final userData = await DatabaseService().getUserData(user.uid);
+      final userData = await DatabaseService().getUserData(user.id);
       if (userData != null) {
         setState(() {
           _nameController.text = userData['name'] ?? '';
@@ -48,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       try {
         final user = AuthService().currentUser;
         if (user != null) {
-          await DatabaseService().updateUserData(user.uid, {
+          await DatabaseService().updateUserData(user.id, {
             'name': _nameController.text.trim(),
             'phone': _phoneController.text.trim(),
           });
@@ -149,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final user = AuthService().currentUser;
                 if (user != null) {
                   await DatabaseService().addAddress(
-                    user.uid,
+                    user.id,
                     addressController.text,
                   );
                   setState(() {}); // Refresh list
@@ -250,7 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     StreamBuilder<List<String>>(
                       stream: DatabaseService().getUserAddresses(
-                        AuthService().currentUser?.uid ?? '',
+                        AuthService().currentUser?.id ?? '',
                       ),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -270,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               icon: Icon(Icons.delete, color: Colors.red),
                               onPressed: () async {
                                 await DatabaseService().removeAddress(
-                                  AuthService().currentUser!.uid,
+                                  AuthService().currentUser!.id,
                                   snapshot.data![i],
                                 );
                                 setState(() {});
