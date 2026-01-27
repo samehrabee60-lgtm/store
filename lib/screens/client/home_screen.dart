@@ -71,8 +71,12 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
           _buildSlider(),
           const SizedBox(height: 20),
-          _buildCategoriesList(horizontal: true),
           _buildProductsSectionTitle(),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 100,
+            child: _buildCategoriesList(horizontal: true),
+          ),
           _buildProductsList(horizontal: true),
         ],
       ),
