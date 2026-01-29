@@ -5,7 +5,6 @@ import '../../models/product_model.dart';
 import '../../services/database_service.dart';
 import '../../services/auth_service.dart';
 // import 'package:firebase_auth/firebase_auth.dart'; // Removed
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/review_model.dart';
 import '../../models/cart_model.dart';
 

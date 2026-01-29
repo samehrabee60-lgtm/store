@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_service.dart';
@@ -18,23 +17,26 @@ class StorageService {
         print('DEBUG: Reading file as bytes for Web...');
         final bytes = await file.readAsBytes();
         print('DEBUG: Read ${bytes.length} bytes. uploading...');
-        
+
         await _client.storage.from(_bucketName).uploadBinary(
-          path,
-          bytes,
-          fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
-        );
+              path,
+              bytes,
+              fileOptions:
+                  const FileOptions(contentType: 'image/jpeg', upsert: true),
+            );
       } else {
         print('DEBUG: Uploading file for Mobile/Desktop...');
         await _client.storage.from(_bucketName).upload(
-          path,
-          file,
-          fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
-        );
+              path,
+              file,
+              fileOptions:
+                  const FileOptions(contentType: 'image/jpeg', upsert: true),
+            );
       }
 
       print('DEBUG: Upload complete. Getting public URL...');
-      final String publicUrl = _client.storage.from(_bucketName).getPublicUrl(path);
+      final String publicUrl =
+          _client.storage.from(_bucketName).getPublicUrl(path);
       print('DEBUG: Got public URL: $publicUrl');
       return publicUrl;
     } catch (e) {

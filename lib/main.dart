@@ -20,7 +20,6 @@ import 'screens/client/profile_screen.dart';
 
 // import 'firebase_options.dart';
 import 'services/database_service.dart';
-import 'services/supabase_service.dart';
 
 void main() async {
   runZonedGuarded(() async {
@@ -103,7 +102,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Cairo',
       ),
-      home: StreamBuilder( // Removed <AuthState> to avoid type error
+      home: StreamBuilder(
+        // Removed <AuthState> to avoid type error
         stream: SupabaseService.client.auth.onAuthStateChange,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
