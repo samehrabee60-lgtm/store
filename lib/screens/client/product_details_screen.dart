@@ -22,7 +22,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     try {
       final companyInfo = await DatabaseService().getCompanyInfo();
       // Default number if not found or empty
-      String phoneNumber = companyInfo?['phone'] ?? '+201000000000';
+      String phoneNumber = companyInfo?['phone'] ?? '01018690407';
 
       // Basic cleaning of the number
       phoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');

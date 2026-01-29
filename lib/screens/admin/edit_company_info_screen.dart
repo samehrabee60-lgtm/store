@@ -37,6 +37,8 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
     } else {
       // Defaults
       _facebookController.text = 'https://www.facebook.com/BetaLabGroup1';
+      _phoneController.text = '01018690407';
+      _emailController.text = 'sameh.rabee007@gmail.com';
     }
     setState(() {
       _isLoading = false;
