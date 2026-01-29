@@ -16,6 +16,7 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
   final TextEditingController _facebookController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
   bool _isLoading = true;
 
@@ -32,6 +33,7 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
       _facebookController.text = data['facebook'] ?? '';
       _phoneController.text = data['phone'] ?? '';
       _emailController.text = data['email'] ?? '';
+      _addressController.text = data['address'] ?? '';
     } else {
       // Defaults
       _facebookController.text = 'https://www.facebook.com/BetaLabGroup1';
@@ -52,6 +54,7 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
         'facebook': _facebookController.text,
         'phone': _phoneController.text,
         'email': _emailController.text,
+        'address': _addressController.text,
       });
 
       setState(() {
@@ -110,6 +113,15 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
                         prefixIcon: Icon(Icons.email),
                       ),
                       keyboardType: TextInputType.emailAddress,
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: InputDecoration(
+                        labelText: 'العنوان',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.location_on),
+                      ),
                     ),
                     SizedBox(height: 30),
                     SizedBox(

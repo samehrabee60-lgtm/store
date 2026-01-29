@@ -76,9 +76,12 @@ class WebFooter extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Cairo')),
                     const SizedBox(height: 20),
-                    _ContactItem(icon: Icons.phone, text: "+20 123 456 7890"),
-                    _ContactItem(icon: Icons.email, text: "info@betalab.com"),
-                    _ContactItem(icon: Icons.location_on, text: "القاهرة، مصر"),
+                    _ContactItem(icon: Icons.phone, text: "01018690407"),
+                    _ContactItem(
+                        icon: Icons.email, text: "sameh.rabee007@gmail.com"),
+                    _ContactItem(
+                        icon: Icons.location_on,
+                        text: "5 شارع بستان الخشاب - القصر العيني"),
                   ],
                 ),
               ),

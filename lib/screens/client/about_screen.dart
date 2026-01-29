@@ -35,8 +35,10 @@ class AboutScreen extends StatelessWidget {
               data['about'] ?? 'شركة بيتا لاب للمستلزمات الطبية...';
           final String facebookUrl =
               data['facebook'] ?? 'https://www.facebook.com/BetaLabGroup1';
-          final String phone = data['phone'] ?? '+201000000000';
-          final String email = data['email'] ?? 'info@betalab.com';
+          final String phone = data['phone'] ?? '01018690407';
+          final String email = data['email'] ?? 'sameh.rabee007@gmail.com';
+          final String address =
+              data['address'] ?? '5 شارع بستان الخشاب - القصر العيني';
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(20),
@@ -113,6 +115,23 @@ class AboutScreen extends StatelessWidget {
                   onTap: () async {
                     final Uri launchUri = Uri(scheme: 'mailto', path: email);
                     await launchUrl(launchUri);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.location_on, color: Colors.orange),
+                  title: Text('العنوان'),
+                  subtitle: Text(address),
+                  onTap: () async {
+                    final String googleMapsUrl =
+                        "https://www.google.com/maps/search/?api=1&query=$address";
+                    if (!await launchUrl(
+                      Uri.parse(googleMapsUrl),
+                      mode: LaunchMode.externalApplication,
+                    )) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Could not launch maps')),
+                      );
+                    }
                   },
                 ),
               ],
