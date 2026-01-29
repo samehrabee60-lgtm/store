@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/database_service.dart'; // استيراد الخدمة المحدثة
 import '../../models/cart_model.dart';
+import '../../widgets/web_footer.dart';
 import '../../models/order_model.dart';
 import '../../services/auth_service.dart';
 
@@ -135,6 +136,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                     ),
+                    if (MediaQuery.of(context).size.width > 800)
+                      const WebFooter(),
                   ],
                 ),
               ),

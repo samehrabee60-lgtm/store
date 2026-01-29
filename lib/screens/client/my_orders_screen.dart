@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/order_model.dart';
 import '../../services/database_service.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/web_footer.dart';
 // import 'package:intl/intl.dart'; // Add intl dependency if needed, or format manually
 
 class MyOrdersScreen extends StatelessWidget {
@@ -32,9 +33,14 @@ class MyOrdersScreen extends StatelessWidget {
 
           final orders = snapshot.data!;
 
+          final isWeb = MediaQuery.of(context).size.width > 800;
+
           return ListView.builder(
-            itemCount: orders.length,
+            itemCount: orders.length + (isWeb ? 1 : 0),
             itemBuilder: (context, index) {
+              if (isWeb && index == orders.length) {
+                return const WebFooter();
+              }
               final order = orders[index];
               return Card(
                 margin: EdgeInsets.all(8),

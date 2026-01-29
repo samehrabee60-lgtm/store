@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/web_footer.dart';
 
 class ClientRegisterScreen extends StatefulWidget {
   const ClientRegisterScreen({super.key});
@@ -26,12 +27,14 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
       });
 
       try {
-        await AuthService().registerUser(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          name: _nameController.text.trim(),
-          phone: _phoneController.text.trim(),
-        ).timeout(const Duration(seconds: 90));
+        await AuthService()
+            .registerUser(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+              name: _nameController.text.trim(),
+              phone: _phoneController.text.trim(),
+            )
+            .timeout(const Duration(seconds: 90));
 
         setState(() {
           _isLoading = false;
@@ -50,13 +53,14 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
         if (mounted) {
           String errorMessage = 'فشل التسجيل: $e';
           if (e.toString().contains('TimeoutException')) {
-            errorMessage = 'انتهت مهلة الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.';
+            errorMessage =
+                'انتهت مهلة الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.';
           }
           // Friendly error for existing user
           if (e.toString().contains('User already registered')) {
             errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل';
           }
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(errorMessage)),
           );
@@ -173,6 +177,8 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                         : Text('تحقق وإنشاء حساب'),
                   ),
                 ),
+                SizedBox(height: 30),
+                if (MediaQuery.of(context).size.width > 800) const WebFooter(),
               ],
             ),
           ),

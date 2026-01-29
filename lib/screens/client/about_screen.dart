@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 // import 'package:firebase_database/firebase_database.dart';
 import '../../services/database_service.dart';
 import '../../widgets/app_drawer.dart';
+import '../../widgets/web_footer.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -134,6 +135,8 @@ class AboutScreen extends StatelessWidget {
                     }
                   },
                 ),
+                SizedBox(height: 30),
+                if (MediaQuery.of(context).size.width > 800) const WebFooter(),
               ],
             ),
           );

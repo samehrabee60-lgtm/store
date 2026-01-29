@@ -7,6 +7,7 @@ import '../../services/auth_service.dart';
 // import 'package:firebase_auth/firebase_auth.dart'; // Removed
 import '../../models/review_model.dart';
 import '../../models/cart_model.dart';
+import '../../widgets/web_footer.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
@@ -349,6 +350,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ],
               ),
             ),
+            if (MediaQuery.of(context).size.width > 800) const WebFooter(),
           ],
         ),
       ),

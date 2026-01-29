@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/web_footer.dart';
 
 class ClientLoginScreen extends StatefulWidget {
   const ClientLoginScreen({super.key});
@@ -125,6 +126,8 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
                   },
                   child: Text('ليس لديك حساب؟ سجل الآن'),
                 ),
+                SizedBox(height: 30),
+                if (MediaQuery.of(context).size.width > 800) const WebFooter(),
               ],
             ),
           ),
