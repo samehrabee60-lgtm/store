@@ -4,7 +4,7 @@ import '../../services/database_service.dart';
 import '../../models/product_model.dart';
 import '../../widgets/app_drawer.dart';
 import 'product_details_screen.dart';
-import '../../widgets/web_layout_container.dart';
+// import '../../widgets/web_layout_container.dart';
 import '../../widgets/responsive_scaffold.dart';
 import '../../widgets/web_footer.dart';
 import '../../widgets/product_card_web.dart';
@@ -101,39 +101,38 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           // Content constrained to look good on ultra-wide screens
-          WebLayoutContainer(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 20.0, bottom: 40.0, left: 20, right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Hero Section
-                  _buildSlider(),
-                  const SizedBox(height: 40),
+          // Content - Full Width now
+          Padding(
+            padding: const EdgeInsets.only(
+                top: 20.0, bottom: 40.0, left: 20, right: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Hero Section
+                _buildSlider(),
+                const SizedBox(height: 40),
 
-                  // Categories Row (Horizontal for Web)
-                  const Text("تصفح الأقسام",
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Cairo')),
-                  const SizedBox(height: 15),
-                  SizedBox(
-                    height: 120, // Taller for web
-                    child: _buildCategoriesList(horizontal: true),
-                  ),
-                  const SizedBox(height: 40),
+                // Categories Row (Horizontal for Web)
+                const Text("تصفح الأقسام",
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo')),
+                const SizedBox(height: 15),
+                SizedBox(
+                  height: 120, // Taller for web
+                  child: _buildCategoriesList(horizontal: true),
+                ),
+                const SizedBox(height: 40),
 
-                  // Products
-                  _buildProductsSectionTitle(),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: 800, // Or dynamic
-                    child: _buildProductsList(horizontal: false),
-                  ),
-                ],
-              ),
+                // Products
+                _buildProductsSectionTitle(),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 800, // Or dynamic
+                  child: _buildProductsList(horizontal: false),
+                ),
+              ],
             ),
           ),
           // Footer Spans Full Width

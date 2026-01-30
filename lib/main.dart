@@ -56,12 +56,6 @@ void main() async {
       // Initialize Supabase
       await SupabaseService.initialize();
 
-      // Initialize Date Formatting
-      await initializeDateFormatting();
-
-      // Initialize Date Formatting
-      await initializeDateFormatting();
-
       // Initialize Firebase (for Notifications)
       // Wrapped in try-catch to prevent app crash if config is invalid (e.g. on Web)
       try {
