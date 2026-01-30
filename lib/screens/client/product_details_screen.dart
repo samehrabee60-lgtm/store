@@ -21,9 +21,8 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Future<void> _launchWhatsApp() async {
     try {
-      final companyInfo = await DatabaseService().getCompanyInfo();
       // Default number if not found or empty
-      String phoneNumber = companyInfo?['phone'] ?? '01018690407';
+      String phoneNumber = '01018690407';
 
       // Basic cleaning of the number
       phoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');

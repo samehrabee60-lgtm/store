@@ -356,12 +356,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder<List<Product>>(
       stream: DatabaseService().products,
       builder: (context, snapshot) {
-        if (snapshot.hasError)
+        if (snapshot.hasError) {
           return Center(child: Text('حدث خطأ: ${snapshot.error}'));
-        if (snapshot.connectionState == ConnectionState.waiting)
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        if (!snapshot.hasData || snapshot.data!.isEmpty)
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('لا توجد منتجات متاحة حالياً'));
+        }
 
         var productList = snapshot.data!;
 
