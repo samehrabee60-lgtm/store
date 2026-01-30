@@ -374,4 +374,73 @@ class DatabaseService {
     // The auth user remains unless deleted via Admin API (backend).
     await _client.from('profiles').delete().eq('id', uid);
   }
+
+  // --- إدارة البنرات (Banners) ---
+  Stream<List<String>> get banners {
+    return _client
+        .from('banners')
+        .stream(primaryKey: ['id'])
+        .order('created_at',
+            ascending: false) // Show newest first or custom order
+        .map((data) {
+          return data.map((e) => e['image_url'] as String).toList();
+        });
+  }
+
+  Future<void> addBanner(String imageUrl) async {
+    await _client.from('banners').insert({
+      'image_url': imageUrl,
+      'active': true, // Optional: if logic uses it
+    });
+  }
+
+  Future<void> deleteBanner(String imageUrl) async {
+    await _client.from('banners').delete().eq('image_url', imageUrl);
+  }
+
+  // --- إدارة الكوبونات (Coupons) ---
+  Stream<List<Map<String, dynamic>>> get coupons {
+    return _client
+        .from('coupons')
+        .stream(primaryKey: ['code']).map((data) => data);
+  }
+
+  Future<void> addCoupon({
+    required String code,
+    required String discountType,
+    required num value,
+    required DateTime expiryDate,
+  }) async {
+    await _client.from('coupons').insert({
+      'code': code.toUpperCase(),
+      'discount_type': discountType, // 'percentage' or 'fixed'
+      'value': value,
+      'expiry_date': expiryDate.toIso8601String(),
+    });
+  }
+
+  Future<void> deleteCoupon(String code) async {
+    await _client.from('coupons').delete().eq('code', code);
+  }
+
+  Future<Map<String, dynamic>?> checkCoupon(String code) async {
+    try {
+      final data = await _client
+          .from('coupons')
+          .select()
+          .eq('code', code.toUpperCase())
+          .maybeSingle();
+
+      // Check expiry
+      if (data != null) {
+        final expiry = DateTime.parse(data['expiry_date']);
+        if (DateTime.now().isAfter(expiry)) {
+          return null; // Expired
+        }
+      }
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
 }

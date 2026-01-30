@@ -107,6 +107,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
             title: const Text('الأعضاء'),
             onTap: () => Navigator.pushNamed(context, '/admin-users'),
           ),
+          ListTile(
+            leading: const Icon(Icons.image),
+            title: const Text('إدارة البنرات'),
+            onTap: () => Navigator.pushNamed(context, '/admin-banners'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications_active),
+            title: const Text('إرسال إشعارات'),
+            onTap: () => Navigator.pushNamed(context, '/admin-notifications'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.bar_chart),
+            title: const Text('التقارير والتحليلات'),
+            onTap: () => Navigator.pushNamed(context, '/admin-analytics'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.percent),
+            title: const Text('كوبونات الخصم'),
+            onTap: () => Navigator.pushNamed(context, '/admin-coupons'),
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.exit_to_app, color: Colors.red),

@@ -146,112 +146,68 @@ class _HomeScreenState extends State<HomeScreen> {
   // --- Components ---
 
   Widget _buildSlider() {
-    return StreamBuilder<List<Product>>(
-        stream: DatabaseService().products,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return CarouselSlider(
-              options: CarouselOptions(
-                height: 180.0,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                aspectRatio: 16 / 9,
-                viewportFraction: 0.85,
-              ),
-              items: imgList
-                  .map((item) => Container(
-                        margin: const EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.0),
-                          image: DecorationImage(
-                              image: NetworkImage(item), fit: BoxFit.cover),
-                        ),
-                      ))
-                  .toList(),
-            );
-          }
-          final products = snapshot.data!;
-          // Show last 5 products (assuming new ones are at the end or just random)
-          // If we are filtering, maybe we don't want to filter the SLIDER?
-          // The slider usually shows "Hot Deals" or "Latest". Let's keep it as latest regardless of filter for now.
-          final latestProducts = products.reversed.take(5).toList();
-
-          if (latestProducts.isEmpty) {
-            return const SizedBox(); // Hide slider if no products?
-          }
-
-          return CarouselSlider(
-            options: CarouselOptions(
-              height: 180.0,
-              autoPlay: true,
-              enlargeCenterPage: true,
-              aspectRatio: 16 / 9,
-              viewportFraction: 0.85,
+    return StreamBuilder<List<String>>(
+      stream: DatabaseService().banners,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show a loading placeholder or shimmer
+          return Container(
+            height: 180,
+            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(15.0),
             ),
-            items: latestProducts.map((product) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) =>
-                                  ProductDetailsScreen(product: product)));
-                    },
-                    child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15.0),
-                              child: product.imageUrl.isNotEmpty
-                                  ? Image.network(product.imageUrl,
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      errorBuilder: (c, e, s) =>
-                                          const Icon(Icons.error))
-                                  : const Icon(Icons.image, size: 50),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.vertical(
-                                      bottom: Radius.circular(15)),
-                                  gradient: LinearGradient(
-                                      colors: [
-                                        Colors.black.withValues(alpha: 0.7),
-                                        Colors.transparent
-                                      ],
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                child: Text(product.name,
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ],
-                        )),
-                  );
-                },
-              );
-            }).toList(),
+            child: const Center(child: CircularProgressIndicator()),
           );
-        });
+        }
+
+        final banners = snapshot.data ?? [];
+
+        // If no banners, fallback to hardcoded placeholders or empty
+        final displayList = banners.isNotEmpty
+            ? banners
+            : [
+                'https://via.placeholder.com/800x400?text=Welcome',
+                'https://via.placeholder.com/800x400?text=Special+Offers'
+              ];
+
+        return CarouselSlider(
+          options: CarouselOptions(
+            height: 180.0,
+            autoPlay: true,
+            enlargeCenterPage: true,
+            aspectRatio: 16 / 9,
+            viewportFraction: 0.85,
+          ),
+          items: displayList.map((item) {
+            return Builder(
+              builder: (BuildContext context) {
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: Image.network(
+                      item,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Colors.grey),
+                    ),
+                  ),
+                );
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 
   Widget _buildCategoriesList({required bool horizontal}) {

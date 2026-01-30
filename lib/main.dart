@@ -18,6 +18,10 @@ import 'screens/client/wishlist_screen.dart';
 import 'screens/client/my_orders_screen.dart';
 import 'screens/admin/admin_orders_screen.dart';
 import 'screens/admin/admin_users_screen.dart';
+import 'screens/admin/admin_banners_screen.dart';
+import 'screens/admin/admin_notifications_screen.dart';
+import 'screens/admin/admin_analytics_screen.dart';
+import 'screens/admin/admin_coupons_screen.dart';
 import 'screens/client/profile_screen.dart';
 
 // import 'firebase_options.dart';
@@ -155,6 +159,10 @@ class MyApp extends StatelessWidget {
         '/orders': (context) => MyOrdersScreen(),
         '/admin-orders': (context) => const AdminOrdersScreen(),
         '/admin-users': (context) => const AdminUsersScreen(),
+        '/admin-banners': (context) => const AdminBannersScreen(),
+        '/admin-notifications': (context) => const AdminNotificationsScreen(),
+        '/admin-analytics': (context) => const AdminAnalyticsScreen(),
+        '/admin-coupons': (context) => const AdminCouponsScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/home': (context) => const HomeScreen(),
       },
