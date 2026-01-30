@@ -5,8 +5,65 @@ import '../../services/auth_service.dart';
 import 'checkout_screen.dart';
 import '../../widgets/responsive_scaffold.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  final TextEditingController _couponController = TextEditingController();
+  String? _appliedCouponCode;
+  double _discountAmount = 0.0;
+  String _discountType = ''; // 'percentage' or 'fixed'
+  num _discountValue = 0;
+
+  @override
+  void dispose() {
+    _couponController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _applyCoupon(double currentTotal) async {
+    final code = _couponController.text.trim();
+    if (code.isEmpty) return;
+
+    final coupon = await DatabaseService().checkCoupon(code);
+    if (coupon == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('كود الخصم غير صالح أو منتهي الصلاحية')),
+      );
+      setState(() {
+        _appliedCouponCode = null;
+        _discountAmount = 0.0;
+      });
+      return;
+    }
+
+    setState(() {
+      _appliedCouponCode = code;
+      _discountType = coupon['discount_type'];
+      _discountValue = coupon['value'];
+
+      if (_discountType == 'percentage') {
+        _discountAmount = currentTotal * (_discountValue / 100);
+      } else {
+        _discountAmount = _discountValue.toDouble();
+      }
+
+      // Ensure discount doesn't exceed total
+      if (_discountAmount > currentTotal) {
+        _discountAmount = currentTotal;
+      }
+    });
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('تم تطبيق الخصم: $_discountAmount ج.م')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,17 +71,17 @@ class CartScreen extends StatelessWidget {
 
     if (user == null) {
       return ResponsiveScaffold(
-        mobileAppBar: AppBar(title: Text('سلة الشراء')),
+        mobileAppBar: AppBar(title: const Text('سلة الشراء')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('يرجى تسجيل الدخول لعرض سلة الشراء'),
+              const Text('يرجى تسجيل الدخول لعرض سلة الشراء'),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/client-login');
                 },
-                child: Text('تسجيل الدخول'),
+                child: const Text('تسجيل الدخول'),
               ),
             ],
           ),
@@ -33,18 +90,18 @@ class CartScreen extends StatelessWidget {
     }
 
     return ResponsiveScaffold(
-      mobileAppBar: AppBar(title: Text('سلة الشراء')),
+      mobileAppBar: AppBar(title: const Text('سلة الشراء')),
       body: StreamBuilder<List<CartItem>>(
         stream: DatabaseService().getCart(user.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Icon(
                     Icons.shopping_cart_outlined,
                     size: 100,
@@ -61,10 +118,25 @@ class CartScreen extends StatelessWidget {
           }
 
           final cartItems = snapshot.data!;
-          final total = cartItems.fold(
+          final subtotal = cartItems.fold(
             0.0,
             (sum, item) => sum + (item.price * item.quantity),
           );
+
+          // Recalculate discount if items changed (e.g. quantity update)
+          // Simple logic: re-apply formula based on stored coupon values
+          if (_appliedCouponCode != null) {
+            if (_discountType == 'percentage') {
+              _discountAmount = subtotal * (_discountValue / 100);
+            } else {
+              _discountAmount = _discountValue.toDouble();
+            }
+            if (_discountAmount > subtotal) _discountAmount = subtotal;
+          } else {
+            _discountAmount = 0.0;
+          }
+
+          final finalTotal = subtotal - _discountAmount;
 
           return Column(
             children: [
@@ -74,7 +146,7 @@ class CartScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     return Card(
-                      margin: EdgeInsets.all(8),
+                      margin: const EdgeInsets.all(8),
                       child: ListTile(
                         leading: Image.network(
                           item.imageUrl.isNotEmpty
@@ -83,7 +155,7 @@ class CartScreen extends StatelessWidget {
                           width: 50,
                           height: 50,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(Icons.image),
+                          errorBuilder: (_, __, ___) => const Icon(Icons.image),
                         ),
                         title: Text(item.productName),
                         subtitle: Text(
@@ -93,10 +165,8 @@ class CartScreen extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(
-                                Icons.remove_circle,
-                                color: Colors.red,
-                              ),
+                              icon: const Icon(Icons.remove_circle,
+                                  color: Colors.red),
                               onPressed: () {
                                 DatabaseService().updateCartItemQuantity(
                                   user.id,
@@ -107,7 +177,8 @@ class CartScreen extends StatelessWidget {
                             ),
                             Text('${item.quantity}'),
                             IconButton(
-                              icon: Icon(Icons.add_circle, color: Colors.green),
+                              icon: const Icon(Icons.add_circle,
+                                  color: Colors.green),
                               onPressed: () {
                                 DatabaseService().updateCartItemQuantity(
                                   user.id,
@@ -117,7 +188,8 @@ class CartScreen extends StatelessWidget {
                               },
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete, color: Colors.grey),
+                              icon:
+                                  const Icon(Icons.delete, color: Colors.grey),
                               onPressed: () {
                                 DatabaseService().removeFromCart(
                                   user.id,
@@ -133,8 +205,8 @@ class CartScreen extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
@@ -146,10 +218,66 @@ class CartScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    // Coupon Section
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _couponController,
+                            decoration: InputDecoration(
+                              labelText: 'كود الخصم',
+                              border: const OutlineInputBorder(),
+                              suffixIcon: _appliedCouponCode != null
+                                  ? IconButton(
+                                      icon: const Icon(Icons.cancel,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        setState(() {
+                                          _appliedCouponCode = null;
+                                          _discountAmount = 0.0;
+                                          _couponController.clear();
+                                        });
+                                      },
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () => _applyCoupon(subtotal),
+                          child: const Text('تطبيق'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // Totals
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text('المجموع الفرعي:',
+                            style: TextStyle(fontSize: 16)),
+                        Text('$subtotal ج.م',
+                            style: const TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    if (_discountAmount > 0)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('الخصم:',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.green)),
+                          Text('-${_discountAmount.toStringAsFixed(2)} ج.م',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.green)),
+                        ],
+                      ),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
                           'الإجمالي:',
                           style: TextStyle(
                             fontSize: 20,
@@ -157,7 +285,7 @@ class CartScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '$total ج.م',
+                          '${finalTotal.toStringAsFixed(2)} ج.م',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -166,12 +294,12 @@ class CartScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 15),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
                           backgroundColor: Theme.of(context).primaryColor,
                           foregroundColor: Colors.white,
                         ),
@@ -180,13 +308,16 @@ class CartScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => CheckoutScreen(
-                                totalAmount: total,
+                                totalAmount:
+                                    finalTotal, // Send discounted total
                                 cartItems: cartItems,
+                                couponCode: _appliedCouponCode,
+                                discountAmount: _discountAmount,
                               ),
                             ),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           'إتمام الشراء',
                           style: TextStyle(fontSize: 18),
                         ),

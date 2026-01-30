@@ -39,6 +39,11 @@ class AdminOrdersScreen extends StatelessWidget {
                       Text(
                         'التاريخ: ${order.date.toString().substring(0, 16)}',
                       ),
+                      if (order.discountAmount > 0)
+                        Text(
+                          'خصم كوبون (${order.couponCode}): -${order.discountAmount} ج.م',
+                          style: TextStyle(color: Colors.green),
+                        ),
                       SizedBox(height: 5),
                       Row(
                         children: [
@@ -176,6 +181,18 @@ class AdminOrdersScreen extends StatelessWidget {
                 cellAlignment: pw.Alignment.centerLeft,
               ),
               pw.Divider(),
+              if (order.discountAmount > 0)
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text('الخصم (${order.couponCode ?? ""}):',
+                        style:
+                            pw.TextStyle(fontSize: 14, color: PdfColors.green)),
+                    pw.Text('-${order.discountAmount} ج.م',
+                        style:
+                            pw.TextStyle(fontSize: 14, color: PdfColors.green)),
+                  ],
+                ),
               pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [

@@ -9,11 +9,15 @@ import '../../services/auth_service.dart';
 class CheckoutScreen extends StatefulWidget {
   final double totalAmount;
   final List<CartItem> cartItems;
+  final String? couponCode;
+  final double discountAmount;
 
   const CheckoutScreen({
     super.key,
     required this.totalAmount,
     required this.cartItems,
+    this.couponCode,
+    this.discountAmount = 0.0,
   });
 
   @override
@@ -45,6 +49,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           status: OrderStatus.pending,
           date: DateTime.now(),
           address: _address,
+          couponCode: widget.couponCode,
+          discountAmount: widget.discountAmount,
         );
 
         await DatabaseService().placeOrder(order);

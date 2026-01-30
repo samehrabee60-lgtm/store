@@ -12,6 +12,8 @@ class OrderModel {
   final OrderStatus status;
   final DateTime date;
   final String address;
+  final String? couponCode;
+  final double discountAmount;
 
   OrderModel({
     required this.id,
@@ -22,6 +24,8 @@ class OrderModel {
     required this.status,
     required this.date,
     required this.address,
+    this.couponCode,
+    this.discountAmount = 0.0,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,9 +34,11 @@ class OrderModel {
       'userName': userName,
       'items': items.map((item) => item.toMap()).toList(),
       'totalAmount': totalAmount,
-      'status': status.toString().split('.').last, // Store as string
-      'date': date.toIso8601String(), // Supabase uses ISO string
+      'status': status.toString().split('.').last,
+      'date': date.toIso8601String(),
       'address': address,
+      'couponCode': couponCode,
+      'discountAmount': discountAmount,
     };
   }
 
@@ -41,8 +47,7 @@ class OrderModel {
       id: id,
       userId: map['userId'] ?? '',
       userName: map['userName'] ?? 'Unknown',
-      items:
-          (map['items'] as List<dynamic>?)
+      items: (map['items'] as List<dynamic>?)
               ?.map((item) => CartItem.fromMap(item))
               .toList() ??
           [],
@@ -53,6 +58,8 @@ class OrderModel {
       ),
       date: DateTime.tryParse(map['date']?.toString() ?? '') ?? DateTime.now(),
       address: map['address'] ?? '',
+      couponCode: map['couponCode'],
+      discountAmount: (map['discountAmount'] ?? 0.0).toDouble(),
     );
   }
 }
