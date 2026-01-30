@@ -17,10 +17,14 @@ import 'screens/client/cart_screen.dart';
 import 'screens/client/wishlist_screen.dart';
 import 'screens/client/my_orders_screen.dart';
 import 'screens/admin/admin_orders_screen.dart';
+import 'screens/admin/admin_users_screen.dart';
 import 'screens/client/profile_screen.dart';
 
 // import 'firebase_options.dart';
 import 'services/database_service.dart';
+
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -61,11 +65,17 @@ void main() async {
       // Test Connection (Optional)
       DatabaseService().testConnection();
 
-      runApp(const MyApp());
+      runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => AuthProvider()),
+          ],
+          child: const MyApp(),
+        ),
+      );
     } catch (e, stack) {
       debugPrint("Error during app initialization: $e");
       debugPrint(stack.toString());
-      // يمكن هنا تشغيل تطبيق بديل يعرض رسالة الخطأ
       runApp(
         MaterialApp(
           home: Scaffold(
@@ -111,24 +121,23 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Cairo',
       ),
-      home: StreamBuilder(
-        // Removed <AuthState> to avoid type error
-        stream: SupabaseService.client.auth.onAuthStateChange,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      home: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          if (auth.isLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          final session = SupabaseService.client.auth.currentSession;
-          if (session != null) {
-            // Check if admin email
-            if (session.user.email == 'sameh.rabee007@gmail.com') {
+
+          if (auth.user != null) {
+            // Check Role using AuthProvider logic
+            if (auth.isAdmin) {
               return const DashboardScreen();
             }
-            // Otherwise go to home (client logged in)
+            // Client logged in
             return const HomeScreen();
           }
+
           // Not logged in
           return const HomeScreen();
         },
@@ -145,6 +154,7 @@ class MyApp extends StatelessWidget {
         '/wishlist': (context) => const WishlistScreen(),
         '/orders': (context) => MyOrdersScreen(),
         '/admin-orders': (context) => const AdminOrdersScreen(),
+        '/admin-users': (context) => const AdminUsersScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/home': (context) => const HomeScreen(),
       },

@@ -346,4 +346,32 @@ class DatabaseService {
       return null;
     }
   }
+
+  // --- إدارة الأعضاء (Admin: Users Management) ---
+  Stream<List<Map<String, dynamic>>> get allUsers {
+    return _client
+        .from('profiles')
+        .stream(primaryKey: ['id'])
+        .eq('role', 'client') // Fetch only clients
+        // .or('role.eq.banned') // Supabase stream filter limitations might apply
+        .map((data) => data);
+  }
+
+  // Fetch all users including banned ones (Future version might be safer for complex filters)
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+    final data = await _client.from('profiles').select().neq('role', 'admin');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Future<void> toggleUserBan(String uid, bool ban) async {
+    await _client
+        .from('profiles')
+        .update({'role': ban ? 'banned' : 'client'}).eq('id', uid);
+  }
+
+  Future<void> deleteUser(String uid) async {
+    // Note: This only deletes the profile record.
+    // The auth user remains unless deleted via Admin API (backend).
+    await _client.from('profiles').delete().eq('id', uid);
+  }
 }

@@ -17,6 +17,25 @@ class AuthService {
     }
   }
 
+  // Get User Role
+  Future<String?> getUserRole(String userId) async {
+    try {
+      final response = await _client
+          .from('profiles')
+          .select('role')
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (response != null) {
+        return response['role'] as String?;
+      }
+      return null;
+    } catch (e) {
+      // If error (e.g. table doesn't exist yet), return null or default to client
+      return null;
+    }
+  }
+
   // Register with email, password, and additional details
   Future<AuthResponse> registerUser({
     required String email,
@@ -114,7 +133,7 @@ class AuthService {
           'role': 'client',
           'created_at': DateTime.now().toIso8601String(),
         });
-        
+
         return phoneResponse;
       }
       return null;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/web_footer.dart';
 
 class ClientRegisterScreen extends StatefulWidget {
@@ -16,29 +17,19 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // String? _verificationId; // Removed
-  // --- الإصلاح هنا: تعريف متغير حالة التحميل ---
-  bool _isLoading = false;
-
   void _register() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       try {
-        await AuthService()
-            .registerUser(
+        await authProvider
+            .signUp(
               email: _emailController.text.trim(),
               password: _passwordController.text.trim(),
               name: _nameController.text.trim(),
               phone: _phoneController.text.trim(),
             )
             .timeout(const Duration(seconds: 90));
-
-        setState(() {
-          _isLoading = false;
-        });
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -47,9 +38,6 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
           Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         }
       } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
         if (mounted) {
           String errorMessage = 'فشل التسجيل: $e';
           if (e.toString().contains('TimeoutException')) {
@@ -73,117 +61,207 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<AuthProvider>().isLoading;
+    final size = MediaQuery.of(context).size;
+    final isWeb = size.width > 800;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Container(
-          padding: EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: Image.asset('assets/images/logo.png', height: 40),
-        ),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'بيانات العميل',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      backgroundColor: Colors.white,
+      body: Row(
+        children: [
+          // Left Side (Web Only)
+          if (isWeb)
+            Expanded(
+              flex: 1,
+              child: Container(
+                color: Colors.black,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/logo.png', height: 150),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Beta Lab Group',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'انضم إلينا الآن',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'الاسم بالكامل',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+              ),
+            ),
+
+          // Right Side: Register Form
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (!isWeb) ...[
+                          Align(
+                            alignment: Alignment.center,
+                            child: Image.asset('assets/images/logo.png',
+                                height: 80),
+                          ),
+                          const SizedBox(height: 30),
+                        ],
+                        const Text(
+                          'إنشاء حساب جديد',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'يرجى ملء البيانات التالية للانضمام إلينا',
+                          style: TextStyle(color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 30),
+                        _buildTextField(
+                          controller: _nameController,
+                          label: 'الاسم بالكامل',
+                          icon: Icons.person_outline,
+                        ),
+                        const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _phoneController,
+                          label: 'رقم الهاتف (+20...)',
+                          icon: Icons.phone_android_outlined,
+                          inputType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'الرجاء إدخال رقم الهاتف';
+                            }
+                            if (!value.startsWith('+')) {
+                              return 'يجب أن يبدأ بـ +';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _emailController,
+                          label: 'البريد الإلكتروني',
+                          icon: Icons.email_outlined,
+                          inputType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 15),
+                        _buildTextField(
+                          controller: _passwordController,
+                          label: 'كلمة المرور',
+                          icon: Icons.lock_outline,
+                          isPassword: true,
+                          validator: (value) {
+                            if (value == null || value.length < 6) {
+                              return 'كلمة المرور قصيرة جداً';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 30),
+                        SizedBox(
+                          height: 55,
+                          child: ElevatedButton(
+                            onPressed: isLoading ? null : _register,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : const Text(
+                                    'تسجيل حساب',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('لديك حساب بالفعل؟'),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text(
+                                'تسجيل الدخول',
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        if (isWeb) const WebFooter(),
+                      ],
+                    ),
                   ),
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'الرجاء إدخال الاسم'
-                      : null,
                 ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    labelText: 'رقم الهاتف (مثل +2010xxxxxxxx)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone),
-                    hintText: '+201xxxxxxxxx',
-                  ),
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'الرجاء إدخال رقم الهاتف';
-                    }
-                    if (!value.startsWith('+')) {
-                      return 'يجب أن يبدأ الرقم بـ + (كود الدولة)';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'البريد الإلكتروني',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'الرجاء إدخال البريد الإلكتروني'
-                      : null,
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'كلمة المرور',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'الرجاء إدخال كلمة المرور';
-                    }
-                    if (value.length < 6) {
-                      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _register,
-                    child: _isLoading
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2),
-                          )
-                        : Text('تحقق وإنشاء حساب'),
-                  ),
-                ),
-                SizedBox(height: 30),
-                if (MediaQuery.of(context).size.width > 800) const WebFooter(),
-              ],
+              ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
+    TextInputType inputType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.red),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        filled: true,
+        fillColor: Colors.grey[50],
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
       ),
+      obscureText: isPassword,
+      keyboardType: inputType,
+      validator: validator ??
+          (value) {
+            if (value == null || value.isEmpty) return 'هذا الحقل مطلوب';
+            return null;
+          },
     );
   }
 }
