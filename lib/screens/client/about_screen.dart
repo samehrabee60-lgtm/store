@@ -4,14 +4,15 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../services/database_service.dart';
 import '../../widgets/app_drawer.dart';
 import '../../widgets/web_footer.dart';
+import '../../widgets/responsive_scaffold.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return ResponsiveScaffold(
+      mobileAppBar: AppBar(
         title: Container(
           padding: EdgeInsets.all(4),
           decoration: BoxDecoration(
@@ -22,7 +23,7 @@ class AboutScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      drawer: AppDrawer(),
+      mobileDrawer: AppDrawer(),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: DatabaseService().getCompanyInfo(),
         builder: (context, snapshot) {

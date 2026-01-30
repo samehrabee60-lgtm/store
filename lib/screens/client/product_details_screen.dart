@@ -8,6 +8,7 @@ import '../../services/auth_service.dart';
 import '../../models/review_model.dart';
 import '../../models/cart_model.dart';
 import '../../widgets/web_footer.dart';
+import '../../widgets/responsive_scaffold.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
@@ -158,8 +159,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return ResponsiveScaffold(
+      mobileAppBar: AppBar(
         title: Text(widget.product.name),
       ),
       body: SingleChildScrollView(

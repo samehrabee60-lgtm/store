@@ -3,6 +3,8 @@ import '../../models/product_model.dart';
 import '../../widgets/product_card.dart';
 import '../../services/database_service.dart';
 
+import '../../widgets/responsive_scaffold.dart';
+
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
 
@@ -11,6 +13,7 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
+  // ... existing state ...
   List<Product> allProducts = [];
   List<Product> displayedProducts = [];
   TextEditingController searchController = TextEditingController();
@@ -175,8 +178,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return ResponsiveScaffold(
+      mobileAppBar: AppBar(
         title: Container(
           padding: EdgeInsets.all(4),
           decoration: BoxDecoration(

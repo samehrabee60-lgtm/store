@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/web_footer.dart';
+import '../../widgets/responsive_scaffold.dart';
 
 class ClientLoginScreen extends StatefulWidget {
   const ClientLoginScreen({super.key});
@@ -51,8 +52,8 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return ResponsiveScaffold(
+      mobileAppBar: AppBar(
         title: Container(
           padding: EdgeInsets.all(4),
           decoration: BoxDecoration(

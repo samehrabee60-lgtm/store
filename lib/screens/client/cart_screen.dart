@@ -3,6 +3,7 @@ import '../../models/cart_model.dart';
 import '../../services/database_service.dart';
 import '../../services/auth_service.dart';
 import 'checkout_screen.dart';
+import '../../widgets/responsive_scaffold.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -12,8 +13,8 @@ class CartScreen extends StatelessWidget {
     final user = AuthService().currentUser;
 
     if (user == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('سلة الشراء')),
+      return ResponsiveScaffold(
+        mobileAppBar: AppBar(title: Text('سلة الشراء')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -31,8 +32,8 @@ class CartScreen extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text('سلة الشراء')),
+    return ResponsiveScaffold(
+      mobileAppBar: AppBar(title: Text('سلة الشراء')),
       body: StreamBuilder<List<CartItem>>(
         stream: DatabaseService().getCart(user.id),
         builder: (context, snapshot) {
