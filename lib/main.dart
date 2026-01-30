@@ -48,60 +48,69 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await dotenv.load(fileName: ".env");
-
-    try {
-      // Initialize Supabase
-      await SupabaseService.initialize();
-
-      // Initialize Firebase (for Notifications)
-      // Wrapped in try-catch to prevent app crash if config is invalid (e.g. on Web)
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
       try {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        FirebaseMessaging.onBackgroundMessage(
-            firebaseMessagingBackgroundHandler);
-        await NotificationService().initialize();
+        await dotenv.load(fileName: ".env");
       } catch (e) {
         debugPrint(
-            "⚠️ Warning: Firebase initialization failed. Notifications will not work.\nError: $e");
+          "Note: .env file not found. Using defaults/environment variables.",
+        );
       }
 
-      // Test Connection (Optional)
-      DatabaseService().testConnection();
+      try {
+        // Initialize Supabase
+        await SupabaseService.initialize();
 
-      runApp(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => AuthProvider()),
-          ],
-          child: const MyApp(),
-        ),
-      );
-    } catch (e, stack) {
-      debugPrint("Error during app initialization: $e");
-      debugPrint(stack.toString());
-      runApp(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: Text(
-                'حدث خطأ أثناء تشغيل التطبيق:\n$e',
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.rtl,
+        // Initialize Firebase (for Notifications)
+        // Wrapped in try-catch to prevent app crash if config is invalid (e.g. on Web)
+        try {
+          await Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform,
+          );
+          FirebaseMessaging.onBackgroundMessage(
+            firebaseMessagingBackgroundHandler,
+          );
+          await NotificationService().initialize();
+        } catch (e) {
+          debugPrint(
+            "⚠️ Warning: Firebase initialization failed. Notifications will not work.\nError: $e",
+          );
+        }
+
+        // Test Connection (Optional)
+        DatabaseService().testConnection();
+
+        runApp(
+          MultiProvider(
+            providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+            child: const MyApp(),
+          ),
+        );
+      } catch (e, stack) {
+        debugPrint("Error during app initialization: $e");
+        debugPrint(stack.toString());
+        runApp(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Text(
+                  'حدث خطأ أثناء تشغيل التطبيق:\n$e',
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                ),
               ),
             ),
           ),
-        ),
-      );
-    }
-  }, (error, stack) {
-    debugPrint("Uncaught error: $error");
-    debugPrint(stack.toString());
-  });
+        );
+      }
+    },
+    (error, stack) {
+      debugPrint("Uncaught error: $error");
+      debugPrint(stack.toString());
+    },
+  );
 }
 
 class MyApp extends StatelessWidget {
