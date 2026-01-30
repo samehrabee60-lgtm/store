@@ -1,13 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseService {
-  static const String supabaseUrl = 'https://frsqtnmmhqvmcsvtjjbz.supabase.co';
-  static const String supabaseAnonKey = 'sb_publishable_rxijMmTUNLtDauSBv5ik1w_8Tx056F0';
-
   static Future<void> initialize() async {
     await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
+      url: dotenv.env['SUPABASE_URL']!,
+      anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
     );
   }
 

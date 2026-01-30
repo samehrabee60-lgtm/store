@@ -95,6 +95,7 @@ class AboutScreen extends StatelessWidget {
                       Uri.parse(facebookUrl),
                       mode: LaunchMode.externalApplication,
                     )) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Could not launch facebook')),
                       );
@@ -130,6 +131,7 @@ class AboutScreen extends StatelessWidget {
                       Uri.parse(googleMapsUrl),
                       mode: LaunchMode.externalApplication,
                     )) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Could not launch maps')),
                       );

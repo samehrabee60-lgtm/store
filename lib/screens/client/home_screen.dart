@@ -229,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       bottom: Radius.circular(15)),
                                   gradient: LinearGradient(
                                       colors: [
-                                        Colors.black.withOpacity(0.7),
+                                        Colors.black.withValues(alpha: 0.7),
                                         Colors.transparent
                                       ],
                                       begin: Alignment.bottomCenter,
@@ -287,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: 28,
                         backgroundColor: isSelected
                             ? Colors.blue
-                            : Colors.blue.withOpacity(0.1),
+                            : Colors.blue.withValues(alpha: 0.1),
                         child: Icon(categories[index]['icon'],
                             size: 28,
                             color: isSelected ? Colors.white : Colors.blue),
@@ -307,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Colors.blue.withOpacity(0.1)
+                          ? Colors.blue.withValues(alpha: 0.1)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -452,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 5)
+            BoxShadow(color: Colors.grey.withValues(alpha: 0.2), blurRadius: 5)
           ],
         ),
         child: Column(

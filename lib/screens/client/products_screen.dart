@@ -27,23 +27,32 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args != null && args is String && _selectedCategory == null) {
-      _selectedCategory = args;
+    if (args != null) {
+      if (args is String && _selectedCategory == null) {
+        _selectedCategory = args;
+      } else if (args is Map) {
+        if (args.containsKey('search')) {
+          searchController.text = args['search'];
+        }
+        if (args.containsKey('category')) {
+          _selectedCategory = args['category'];
+        }
+      }
     }
   }
 
   void _applyFilters() {
     List<Product> temp = List.from(allProducts);
 
-    // Search
+    // Search (Improved)
     if (searchController.text.isNotEmpty) {
-      temp = temp
-          .where(
-            (p) => p.name.toLowerCase().contains(
-                  searchController.text.toLowerCase(),
-                ),
-          )
-          .toList();
+      final query = searchController.text.toLowerCase();
+      temp = temp.where((p) {
+        final matchesName = p.name.toLowerCase().contains(query);
+        final matchesDesc = p.description.toLowerCase().contains(query);
+        final matchesCat = p.category.toLowerCase().contains(query);
+        return matchesName || matchesDesc || matchesCat;
+      }).toList();
     }
 
     // Category

@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'services/notification_service.dart';
+import 'firebase_options.dart';
 import 'services/supabase_service.dart';
 import 'screens/client/home_screen.dart';
 import 'screens/client/products_screen.dart';
@@ -21,41 +22,49 @@ import 'screens/client/profile_screen.dart';
 // import 'firebase_options.dart';
 import 'services/database_service.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+// Top-level function to handle background messages
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint("Handling a background message: ${message.messageId}");
+  // You can process the message here, e.g., show a local notification
+  NotificationService().showNotification(
+    id: message.hashCode,
+    title: message.notification?.title ?? 'New Notification',
+    body: message.notification?.body ?? 'You have a new message.',
+    payload: message.data['route'],
+  );
+}
+
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load(fileName: ".env");
 
     try {
-      // تهيئة Supabase
+      // Initialize Supabase
       await SupabaseService.initialize();
 
-      // تهيئة Firebase (تم إزالته)
-      /*
-      try {
-        if (Firebase.apps.isEmpty) {
-          await Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          );
-        } else {
-          Firebase.app(); // Ensure default app exists
-        }
-      } catch (e) {
-        // Ignore duplicate app error which can happen during hot reload/restart
-        if (e.toString().contains("already exists")) {
-          // Default app already exists, safe to proceed
-        } else {
-          rethrow;
-        }
-      }
-      */
+      // Initialize Firebase (for Notifications)
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
-      // اختبار الاتصال عند بدء التشغيل
+      // Set Background Handler
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+      // Initialize Notification Service
+      await NotificationService().initialize();
+
+      // Test Connection (Optional)
       DatabaseService().testConnection();
 
       runApp(const MyApp());
     } catch (e, stack) {
-      print("Error during app initialization: $e");
-      print(stack);
+      debugPrint("Error during app initialization: $e");
+      debugPrint(stack.toString());
       // يمكن هنا تشغيل تطبيق بديل يعرض رسالة الخطأ
       runApp(
         MaterialApp(
@@ -72,8 +81,8 @@ void main() async {
       );
     }
   }, (error, stack) {
-    print("Uncaught error: $error");
-    print(stack);
+    debugPrint("Uncaught error: $error");
+    debugPrint(stack.toString());
   });
 }
 

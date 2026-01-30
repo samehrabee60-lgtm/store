@@ -3,6 +3,8 @@ import '../models/product_model.dart';
 import '../screens/client/product_details_screen.dart';
 import '../services/database_service.dart';
 import '../services/auth_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -32,13 +34,20 @@ class ProductCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     product.imageUrl.isNotEmpty
-                        ? Image.network(
-                            product.imageUrl,
+                        ? CachedNetworkImage(
+                            imageUrl: product.imageUrl,
                             width: double.infinity,
                             height: double.infinity,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Icon(Icons.image),
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                color: Colors.white,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                           )
                         : Container(
                             color: Colors.grey[200],
@@ -46,6 +55,7 @@ class ProductCard extends StatelessWidget {
                             height: double.infinity,
                             child: Icon(Icons.image, size: 50),
                           ),
+                    // ... Positioned wishlist icon ...
                     Positioned(
                       top: 5,
                       right: 5,

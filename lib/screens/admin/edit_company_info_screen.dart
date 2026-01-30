@@ -6,7 +6,7 @@ class EditCompanyInfoScreen extends StatefulWidget {
   const EditCompanyInfoScreen({super.key});
 
   @override
-  _EditCompanyInfoScreenState createState() => _EditCompanyInfoScreenState();
+  State<EditCompanyInfoScreen> createState() => _EditCompanyInfoScreenState();
 }
 
 class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
@@ -62,6 +62,7 @@ class _EditCompanyInfoScreenState extends State<EditCompanyInfoScreen> {
       setState(() {
         _isLoading = false;
       });
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('تم الحفظ بنجاح')));
     }

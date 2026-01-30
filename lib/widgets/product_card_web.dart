@@ -35,13 +35,14 @@ class _ProductCardWebState extends State<ProductCardWeb> {
             boxShadow: _isHovered
                 ? [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10))
                   ]
                 : [
                     BoxShadow(
-                        color: Colors.grey.withOpacity(0.1), blurRadius: 5)
+                        color: Colors.grey.withValues(alpha: 0.1),
+                        blurRadius: 5)
                   ],
           ),
           child: Column(

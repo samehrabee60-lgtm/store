@@ -5,7 +5,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -34,11 +34,13 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         // Navigate to Dashboard
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/admin-dashboard');
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('فشل تسجيل الدخول: ${e.toString()}')),
         );

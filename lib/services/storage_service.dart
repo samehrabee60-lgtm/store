@@ -8,15 +8,15 @@ class StorageService {
 
   // Upload image
   Future<String?> uploadImage(dynamic file) async {
-    print('DEBUG: Starting uploadImage (Supabase)...');
+    // debugPrint('DEBUG: Starting uploadImage (Supabase)...');
     try {
       String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       String path = fileName; // Path inside the bucket
 
       if (kIsWeb) {
-        print('DEBUG: Reading file as bytes for Web...');
+        // debugPrint('DEBUG: Reading file as bytes for Web...');
         final bytes = await file.readAsBytes();
-        print('DEBUG: Read ${bytes.length} bytes. uploading...');
+        // debugPrint('DEBUG: Read ${bytes.length} bytes. uploading...');
 
         await _client.storage.from(_bucketName).uploadBinary(
               path,
@@ -25,7 +25,7 @@ class StorageService {
                   const FileOptions(contentType: 'image/jpeg', upsert: true),
             );
       } else {
-        print('DEBUG: Uploading file for Mobile/Desktop...');
+        // debugPrint('DEBUG: Uploading file for Mobile/Desktop...');
         await _client.storage.from(_bucketName).upload(
               path,
               file,
@@ -34,13 +34,13 @@ class StorageService {
             );
       }
 
-      print('DEBUG: Upload complete. Getting public URL...');
+      // debugPrint('DEBUG: Upload complete. Getting public URL...');
       final String publicUrl =
           _client.storage.from(_bucketName).getPublicUrl(path);
-      print('DEBUG: Got public URL: $publicUrl');
+      // debugPrint('DEBUG: Got public URL: $publicUrl');
       return publicUrl;
     } catch (e) {
-      print('DEBUG: Error in uploadImage: $e');
+      debugPrint('DEBUG: Error in uploadImage: $e');
       rethrow;
     }
   }

@@ -14,17 +14,22 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   # تحديث مكتبات Firebase لضمان التوافق الكامل مع Realtime Database في سنغافورة
-  # firebase_core: ^3.10.1
+  firebase_core: ^3.10.1
+  firebase_messaging: ^15.2.1
   # firebase_auth: ^5.4.1
   # firebase_database: ^11.1.1 
   # cloud_firestore: ^5.6.1
   # firebase_storage: ^12.4.1
+  flutter_local_notifications: ^18.0.1
   supabase_flutter: ^2.8.3
   
   provider: ^6.1.2
   carousel_slider: ^5.0.0
   image_picker: ^1.1.2
   url_launcher: ^6.3.1
+  flutter_dotenv: ^6.0.0
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +53,7 @@ flutter:
   # تعريف الأصول (Assets)
   assets:
     - assets/images/
+    - .env
 
   # إعداد خط Cairo (تأكد من وجود الملف في مجلد assets/fonts/)
   # fonts:

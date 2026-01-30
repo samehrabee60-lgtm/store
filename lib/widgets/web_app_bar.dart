@@ -45,13 +45,20 @@ class WebAppBar extends StatelessWidget implements PreferredSizeWidget {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey[300]!),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.search, color: Colors.grey),
-                  SizedBox(width: 10),
+                  const Icon(Icons.search, color: Colors.grey),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      decoration: InputDecoration(
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          Navigator.pushNamed(context, '/products',
+                              arguments: {'search': value.trim()});
+                        }
+                      },
+                      decoration: const InputDecoration(
                         hintText: "ابحث عن منتجات...",
                         border: InputBorder.none,
                       ),
