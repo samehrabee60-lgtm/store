@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -44,7 +46,12 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.person),
             title: Text('الملف الشخصي'),
             onTap: () {
-              Navigator.of(context).pushNamed('/profile');
+              final auth = Provider.of<AuthProvider>(context, listen: false);
+              if (auth.user != null) {
+                Navigator.of(context).pushNamed('/profile');
+              } else {
+                Navigator.of(context).pushNamed('/client-login');
+              }
             },
           ),
           ListTile(

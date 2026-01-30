@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../services/database_service.dart';
 import '../../widgets/app_drawer.dart';
 
@@ -165,6 +167,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context);
+
+    if (auth.user == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('الملف الشخصي'), centerTitle: true),
+        drawer: const AppDrawer(),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.lock_outline, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text('يجب تسجيل الدخول لعرض الملف الشخصي',
+                  style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/client-login');
+                },
+                child: const Text('تسجيل دخول'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('الملف الشخصي'), centerTitle: true),
       drawer: AppDrawer(),

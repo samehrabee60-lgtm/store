@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class WebAppBar extends StatelessWidget implements PreferredSizeWidget {
   const WebAppBar({super.key});
@@ -93,7 +95,14 @@ class WebAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           IconButton(
             icon: const Icon(Icons.person_outline),
-            onPressed: () => Navigator.pushNamed(context, '/profile'),
+            onPressed: () {
+              final auth = Provider.of<AuthProvider>(context, listen: false);
+              if (auth.user != null) {
+                Navigator.pushNamed(context, '/profile');
+              } else {
+                Navigator.pushNamed(context, '/client-login');
+              }
+            },
             tooltip: "حسابي",
           ),
         ],
