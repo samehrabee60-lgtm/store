@@ -58,11 +58,16 @@ void main() async {
         );
       }
 
+      bool isSupabaseInitialized = false;
+      String? initError;
+
       // Initialize Supabase
       try {
         await SupabaseService.initialize();
+        isSupabaseInitialized = true;
       } catch (e) {
         debugPrint("🛑 Supabase initialization failed: $e");
+        initError = "Supabase init failed: $e";
       }
 
       // Initialize Firebase (for Notifications)
@@ -82,9 +87,29 @@ void main() async {
 
       // Test Connection (Optional)
       try {
-        DatabaseService().testConnection();
+        if (isSupabaseInitialized) {
+          DatabaseService().testConnection();
+        }
       } catch (e) {
         debugPrint("⚠️ Warning: Database connection test failed: $e");
+      }
+
+      if (!isSupabaseInitialized) {
+        runApp(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Text(
+                  'فشل تشغيل التطبيق (قاعدة البيانات):\n$initError',
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(color: Colors.red, fontSize: 18),
+                ),
+              ),
+            ),
+          ),
+        );
+        return;
       }
 
       runApp(
