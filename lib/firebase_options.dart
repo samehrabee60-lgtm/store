@@ -50,12 +50,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'REPLACE_WITH_YOUR_WEB_API_KEY',
-    appId: 'REPLACE_WITH_YOUR_WEB_APP_ID',
-    messagingSenderId: 'REPLACE_WITH_YOUR_MESSAGING_SENDER_ID',
-    projectId: 'REPLACE_WITH_YOUR_PROJECT_ID',
-    authDomain: 'REPLACE_WITH_YOUR_AUTH_DOMAIN',
-    storageBucket: 'REPLACE_WITH_YOUR_STORAGE_BUCKET',
+    apiKey: 'AIzaSyDsZl_J0bQ4CtkRQ4K4hzLvLKusX4g8HPE',
+    appId: '1:960357270163:web:placeholder',
+    messagingSenderId: '960357270163',
+    projectId: 'betalab-beta-lab-store',
+    authDomain: 'betalab-beta-lab-store.firebaseapp.com',
+    storageBucket: 'betalab-beta-lab-store.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
