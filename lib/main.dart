@@ -80,32 +80,16 @@ void main() async {
         );
       }
 
-        // Test Connection (Optional)
-        DatabaseService().testConnection();
-
-        runApp(
-          MultiProvider(
-            providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
-            child: const MyApp(),
-          ),
-        );
-      } catch (e, stack) {
-        debugPrint("Error during app initialization: $e");
-        debugPrint(stack.toString());
-        runApp(
-          MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: Text(
-                  'حدث خطأ أثناء تشغيل التطبيق:\n$e',
-                  textAlign: TextAlign.center,
-                  textDirection: TextDirection.rtl,
-                ),
-              ),
-            ),
-          ),
-        );
+      } catch (e) {
+        debugPrint("⚠️ Warning: Database connection test failed: $e");
       }
+
+      runApp(
+        MultiProvider(
+          providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+          child: const MyApp(),
+        ),
+      );
     },
     (error, stack) {
       debugPrint("Uncaught error: $error");
