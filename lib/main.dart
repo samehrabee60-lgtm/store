@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -54,6 +55,9 @@ void main() async {
     try {
       // Initialize Supabase
       await SupabaseService.initialize();
+
+      // Initialize Date Formatting
+      await initializeDateFormatting();
 
       // Initialize Firebase (for Notifications)
       await Firebase.initializeApp(
