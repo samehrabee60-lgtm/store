@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDsZl_J0bQ4CtkRQ4K4hzLvLKusX4g8HPE',
-    appId: '1:960357270163:web:placeholder',
+    appId: '1:960357270163:web:a2e8c0826411abba008366', // Fixed placeholder
     messagingSenderId: '960357270163',
     projectId: 'betalab-beta-lab-store',
     authDomain: 'betalab-beta-lab-store.firebaseapp.com',

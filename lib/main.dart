@@ -58,25 +58,27 @@ void main() async {
         );
       }
 
+      // Initialize Supabase
       try {
-        // Initialize Supabase
         await SupabaseService.initialize();
+      } catch (e) {
+        debugPrint("🛑 Supabase initialization failed: $e");
+      }
 
-        // Initialize Firebase (for Notifications)
-        // Wrapped in try-catch to prevent app crash if config is invalid (e.g. on Web)
-        try {
-          await Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          );
-          FirebaseMessaging.onBackgroundMessage(
-            firebaseMessagingBackgroundHandler,
-          );
-          await NotificationService().initialize();
-        } catch (e) {
-          debugPrint(
-            "⚠️ Warning: Firebase initialization failed. Notifications will not work.\nError: $e",
-          );
-        }
+      // Initialize Firebase (for Notifications)
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        FirebaseMessaging.onBackgroundMessage(
+          firebaseMessagingBackgroundHandler,
+        );
+        await NotificationService().initialize();
+      } catch (e) {
+        debugPrint(
+          "⚠️ Warning: Firebase initialization failed. Notifications will not work.\nError: $e",
+        );
+      }
 
         // Test Connection (Optional)
         DatabaseService().testConnection();
