@@ -59,16 +59,22 @@ void main() async {
       // Initialize Date Formatting
       await initializeDateFormatting();
 
+      // Initialize Date Formatting
+      await initializeDateFormatting();
+
       // Initialize Firebase (for Notifications)
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-
-      // Set Background Handler
-      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-      // Initialize Notification Service
-      await NotificationService().initialize();
+      // Wrapped in try-catch to prevent app crash if config is invalid (e.g. on Web)
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        FirebaseMessaging.onBackgroundMessage(
+            firebaseMessagingBackgroundHandler);
+        await NotificationService().initialize();
+      } catch (e) {
+        debugPrint(
+            "⚠️ Warning: Firebase initialization failed. Notifications will not work.\nError: $e");
+      }
 
       // Test Connection (Optional)
       DatabaseService().testConnection();
