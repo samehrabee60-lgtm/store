@@ -80,6 +80,9 @@ void main() async {
         );
       }
 
+      // Test Connection (Optional)
+      try {
+        DatabaseService().testConnection();
       } catch (e) {
         debugPrint("⚠️ Warning: Database connection test failed: $e");
       }
