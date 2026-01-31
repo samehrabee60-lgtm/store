@@ -73,7 +73,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         }
 
         final product = Product(
-          id: widget.product?.id ?? '', // ID handled by service/DB for new items
+          id: widget.product?.id ??
+              '', // ID handled by service/DB for new items
           name: _nameController.text,
           category: _selectedCategory,
           price: double.tryParse(_priceController.text) ?? 0.0,
@@ -101,7 +102,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
         if (mounted) {
           String errorMessage = 'حدث خطأ: ${e.toString()}';
           if (e.toString().contains('TimeoutException')) {
-            errorMessage = 'انتهت مهلة الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.';
+            errorMessage =
+                'انتهت مهلة الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.';
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(errorMessage)),
@@ -142,7 +144,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   child: _imageFile != null
                       ? (kIsWeb
                           ? Image.network(_imageFile!.path, fit: BoxFit.cover)
-                          : Image.file(File(_imageFile!.path), fit: BoxFit.cover))
+                          : Image.file(File(_imageFile!.path),
+                              fit: BoxFit.cover))
                       : (widget.product?.imageUrl.isNotEmpty ?? false)
                           ? Image.network(widget.product!.imageUrl,
                               fit: BoxFit.cover)

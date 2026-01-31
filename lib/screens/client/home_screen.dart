@@ -28,10 +28,22 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   final List<Map<String, dynamic>> categories = const [
-    {'name': 'أجهزة', 'icon': Icons.device_hub},
-    {'name': 'محاليل', 'icon': Icons.science},
-    {'name': 'مستلزمات', 'icon': Icons.medical_services},
-    {'name': 'أخرى', 'icon': Icons.more_horiz},
+    {
+      'name': 'أجهزة',
+      'icon': Icons.device_hub,
+    },
+    {
+      'name': 'محاليل',
+      'icon': Icons.science,
+    },
+    {
+      'name': 'مستلزمات',
+      'icon': Icons.medical_services,
+    },
+    {
+      'name': 'أخرى',
+      'icon': Icons.more_horiz,
+    },
   ];
 
   @override
@@ -95,54 +107,183 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // --- Web Layout (Sidebar + Grid) ---
-  // --- Web Layout (Full Width Professional) ---
   Widget _buildWebLayout() {
-    return SingleChildScrollView(
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left Sidebar (Categories)
+              SizedBox(
+                width: 300,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: _buildCategoriesSidebar(),
+                  ),
+                ),
+              ),
+
+              // Right Content (Slider + Products)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Hero Section
+                            _buildSlider(),
+                            const SizedBox(height: 40),
+
+                            // Products
+                            _buildProductsSectionTitle(),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              height: 800, // Or dynamic
+                              child: _buildProductsList(horizontal: false),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Footer Spans Full Width (inside ScrollView, or specific layout)
+                      const WebFooter(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- Components ---
+
+  Widget _buildCategoriesSidebar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          // Content constrained to look good on ultra-wide screens
-          // Content - Full Width now
-          Padding(
-            padding: const EdgeInsets.only(
-                top: 20.0, bottom: 40.0, left: 20, right: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Hero Section
-                _buildSlider(),
-                const SizedBox(height: 40),
-
-                // Categories Row (Horizontal for Web)
-                const Text("تصفح الأقسام",
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Cairo')),
-                const SizedBox(height: 15),
-                SizedBox(
-                  height: 120, // Taller for web
-                  child: _buildCategoriesList(horizontal: true),
-                ),
-                const SizedBox(height: 40),
-
-                // Products
-                _buildProductsSectionTitle(),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 800, // Or dynamic
-                  child: _buildProductsList(horizontal: false),
-                ),
-              ],
+          // Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            decoration: const BoxDecoration(
+              color: Color(0xFFd92b2c), // Red Header
+              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+            ),
+            child: const Text(
+              "الأقسام",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontFamily: 'Cairo',
+              ),
             ),
           ),
-          // Footer Spans Full Width
-          const WebFooter(),
+          // List (Dynamic Products)
+          StreamBuilder<List<Product>>(
+            stream: DatabaseService().products,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              final products = snapshot.data ?? [];
+
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final cat = categories[index];
+                  final catName = cat['name'] as String;
+
+                  // Filter products for this category
+                  final catProducts =
+                      products.where((p) => p.category == catName).toList();
+
+                  return Theme(
+                    data: Theme.of(context)
+                        .copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      leading:
+                          Icon(cat['icon'], color: const Color(0xFFd92b2c)),
+                      title: Text(
+                        catName,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      textColor: const Color(0xFFd92b2c),
+                      iconColor: const Color(0xFFd92b2c),
+                      childrenPadding:
+                          const EdgeInsets.only(right: 20, bottom: 10),
+                      children: catProducts.isEmpty
+                          ? [
+                              const ListTile(
+                                dense: true,
+                                title: Text("لا توجد منتجات",
+                                    style: TextStyle(color: Colors.grey)),
+                              )
+                            ]
+                          : catProducts.map((product) {
+                              return ListTile(
+                                dense: true,
+                                title: Text(
+                                  product.name,
+                                  style: TextStyle(color: Colors.grey[700]),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                leading: const Icon(
+                                  Icons.arrow_left,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                                onTap: () {
+                                  // Navigate to Product Details
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProductDetailsScreen(
+                                              product: product),
+                                    ),
+                                  );
+                                },
+                              );
+                            }).toList(),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  // --- Components ---
+  // Helper _buildCategoryAccordionItem removed as it's integrated above
 
   Widget _buildSlider() {
     return StreamBuilder<List<String>>(
@@ -333,6 +474,13 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.pushNamed(context, '/products'),
               child: const Text('عرض الكل'),
             ),
+          if (_selectedCategory != null)
+            TextButton(
+              onPressed: () => setState(() {
+                _selectedCategory = null;
+              }),
+              child: const Text('عرض الكل'),
+            ),
         ],
       ),
     );
@@ -354,7 +502,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
         var productList = snapshot.data!;
 
-        // --- FILTERING LOGIC ---
         if (_selectedCategory != null) {
           productList = productList
               .where((p) => p.category == _selectedCategory)
