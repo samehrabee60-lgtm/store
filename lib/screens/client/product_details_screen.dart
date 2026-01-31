@@ -23,29 +23,29 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Future<void> _launchWhatsApp() async {
     try {
-      String phoneNumber = '01018690407';
-      phoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+      String phoneNumber =
+          '01018690407'; // Ensure this uses the correct international format if needed, e.g., +20...
+      // Remove non-digits
+      phoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
 
-      if (phoneNumber.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('رقم الواتساب غير متوفر حالياً')),
-          );
-        }
-        return;
+      // Add country code if missing (assuming Egypt +20 for 010...)
+      if (phoneNumber.startsWith('010') ||
+          phoneNumber.startsWith('011') ||
+          phoneNumber.startsWith('012') ||
+          phoneNumber.startsWith('015')) {
+        phoneNumber = '2$phoneNumber';
       }
 
-      final Uri whatsappUrl = Uri.parse('whatsapp://send?phone=$phoneNumber');
-      final Uri webUrl = Uri.parse('https://wa.me/$phoneNumber');
+      final Uri whatsappUrl = Uri.parse("https://wa.me/$phoneNumber");
 
       if (await canLaunchUrl(whatsappUrl)) {
-        await launchUrl(whatsappUrl);
-      } else if (await canLaunchUrl(webUrl)) {
-        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('لا يمكن فتح واتساب')),
+            const SnackBar(
+                content: Text(
+                    'لا يمكن فتح واتساب، تأكد من تثبيت التطبيق أو المتصفح')),
           );
         }
       }
