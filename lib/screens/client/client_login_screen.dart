@@ -72,7 +72,7 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'بوابتك لمستقبل الإلكترونيات',
+                      'بوابتك لتسوق افضل من اجل معملك',
                       style: TextStyle(
                         color: Colors.grey[400],
                         fontSize: 18,
