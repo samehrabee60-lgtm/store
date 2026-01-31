@@ -149,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen> {
       stream: DatabaseService().banners,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show a loading placeholder or shimmer
           return Container(
             height: 180,
             margin: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -163,13 +162,48 @@ class _HomeScreenState extends State<HomeScreen> {
 
         final banners = snapshot.data ?? [];
 
-        // If no banners, fallback to hardcoded placeholders or empty
-        final displayList = banners.isNotEmpty
-            ? banners
-            : [
-                'https://via.placeholder.com/800x400?text=Welcome',
-                'https://via.placeholder.com/800x400?text=Special+Offers'
-              ];
+        if (banners.isEmpty) {
+          // Show default local banner if no dynamic banners exist
+          return Container(
+            height: 180,
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [const Color(0xFFd92b2c), Colors.red.shade300],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.storefront, color: Colors.white, size: 50),
+                const SizedBox(width: 20),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      "أهلاً بك في Beta Lab Store",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo', // Ensure font is used
+                      ),
+                    ),
+                    Text(
+                      "تسوق أفضل المنتجات الطبية والمخبرية",
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
 
         return CarouselSlider(
           options: CarouselOptions(
@@ -179,25 +213,22 @@ class _HomeScreenState extends State<HomeScreen> {
             aspectRatio: 16 / 9,
             viewportFraction: 0.85,
           ),
-          items: displayList.map((item) {
+          items: banners.map((item) {
             return Builder(
               builder: (BuildContext context) {
                 return Container(
                   width: MediaQuery.of(context).size.width,
                   margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
                     child: Image.network(
                       item,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                          Icons.broken_image,
-                          size: 50,
-                          color: Colors.grey),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.broken_image,
+                            size: 50, color: Colors.grey),
+                      ),
                     ),
                   ),
                 );
