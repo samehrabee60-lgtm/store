@@ -112,15 +112,6 @@ class AboutScreen extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.email, color: Colors.red),
-                  title: Text('البريد الإلكتروني'),
-                  subtitle: Text(email),
-                  onTap: () async {
-                    final Uri launchUri = Uri(scheme: 'mailto', path: email);
-                    await launchUrl(launchUri);
-                  },
-                ),
-                ListTile(
                   leading: Icon(Icons.location_on, color: Colors.orange),
                   title: Text('العنوان'),
                   subtitle: Text(address),

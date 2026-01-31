@@ -46,12 +46,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     // Search (Improved)
     if (searchController.text.isNotEmpty) {
-      final query = searchController.text.toLowerCase();
+      String normalize(String text) {
+        return text
+            .replaceAll(RegExp(r'[أإآ]'), 'ا')
+            .replaceAll('ة', 'ه')
+            .replaceAll('ى', 'ي')
+            .toLowerCase();
+      }
+
+      final query = normalize(searchController.text);
       temp = temp.where((p) {
-        final matchesName = p.name.toLowerCase().contains(query);
-        final matchesDesc = p.description.toLowerCase().contains(query);
-        final matchesCat = p.category.toLowerCase().contains(query);
-        return matchesName || matchesDesc || matchesCat;
+        final name = normalize(p.name);
+        final desc = normalize(p.description);
+        final cat = normalize(p.category);
+        return name.contains(query) ||
+            desc.contains(query) ||
+            cat.contains(query);
       }).toList();
     }
 

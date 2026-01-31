@@ -78,8 +78,6 @@ class WebFooter extends StatelessWidget {
                     const SizedBox(height: 20),
                     _ContactItem(icon: Icons.phone, text: "01018690407"),
                     _ContactItem(
-                        icon: Icons.email, text: "sameh.rabee007@gmail.com"),
-                    _ContactItem(
                         icon: Icons.location_on,
                         text: "5 شارع بستان الخشاب - القصر العيني"),
                   ],
