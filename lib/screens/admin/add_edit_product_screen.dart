@@ -28,7 +28,8 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   XFile? _imageFile; // Main image
   PlatformFile? _pdfFile; // PDF file
   String? _pdfUrl; // Existing PDF URL
-  List<XFile> _newAdditionalImages = []; // New additional images to upload
+  final List<XFile> _newAdditionalImages =
+      []; // New additional images to upload
   List<String> _existingAdditionalImages =
       []; // Existing additional images URLs
 
@@ -293,7 +294,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
               ),
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'الفئة',
                   border: OutlineInputBorder(),

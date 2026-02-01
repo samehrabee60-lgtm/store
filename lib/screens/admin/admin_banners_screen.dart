@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/database_service.dart';
 import '../../services/storage_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AdminBannersScreen extends StatefulWidget {
   const AdminBannersScreen({super.key});
@@ -75,11 +76,31 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
           );
         }
       }
-    } catch (e) {
-      // Show error
+    } on PostgrestException catch (e) {
+      // Catch specific RLS error
+      debugPrint('Supabase Error: ${e.message} code: ${e.code}');
+      String errorMessage = 'حدث خطأ أثناء الإضافة';
+      if (e.code == '42501') {
+        errorMessage =
+            'ليس لديك صلاحية لإضافة بنرات. تأكد من سياسات الأمان (RLS) في قاعدة البيانات.';
+      } else {
+        errorMessage = 'خطأ في قاعدة البيانات: ${e.message}';
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e')),
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('General Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ غير متوقع: $e')),
         );
       }
     } finally {
