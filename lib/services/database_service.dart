@@ -187,23 +187,39 @@ class DatabaseService {
     if (quantity <= 0) {
       await removeFromCart(uid, productId);
     } else {
-      await _client.from('cart_items').upsert({
-        'user_id': uid,
-        'product_id': int.tryParse(productId),
-        'quantity': quantity
-      });
+      // Find the cart item to get its ID, or assume unique constraint on user_id + product_id
+      // For safety, let's look it up
+      final existing = await _client
+          .from('cart_items')
+          .select()
+          .match({'user_id': uid, 'product_id': productId}).maybeSingle();
+
+      if (existing != null) {
+        await _client
+            .from('cart_items')
+            .update({'quantity': quantity}).eq('id', existing['id']);
+      }
     }
   }
 
   Future<void> addToCart(String uid, CartItem item) async {
-    await _client.from('cart_items').upsert({
-      'user_id': uid,
-      'product_id': int.tryParse(item.productId),
-      'quantity':
-          item.quantity // logic needs to check existing qty to increment?
-      // Upsert overwrites. We need to fetch first or write a function.
-      // Simplified: just set quantity for now.
-    });
+    final existing = await _client
+        .from('cart_items')
+        .select()
+        .match({'user_id': uid, 'product_id': item.productId}).maybeSingle();
+
+    if (existing != null) {
+      final newQty = (existing['quantity'] as int) + item.quantity;
+      await _client
+          .from('cart_items')
+          .update({'quantity': newQty}).eq('id', existing['id']);
+    } else {
+      await _client.from('cart_items').insert({
+        'user_id': uid,
+        'product_id': int.tryParse(item.productId),
+        'quantity': item.quantity,
+      });
+    }
   }
 
   Future<void> removeFromCart(String uid, String productId) async {
@@ -218,16 +234,51 @@ class DatabaseService {
   }
 
   Stream<List<CartItem>> getCart(String uid) {
-    // Requires a join with products to get name/price/image
     return _client
         .from('cart_items')
         .stream(primaryKey: ['id'])
         .eq('user_id', uid)
-        .map((data) {
-          // This returns cart items. We need product details.
-          // Ideally we use .select('*, products(*)') but streams don't support deep joins easily in Flutter SDK yet (realtime).
-          // We might return simple items.
-          return []; // Placeholder
+        .asyncMap((List<Map<String, dynamic>> cartData) async {
+          if (cartData.isEmpty) return <CartItem>[];
+
+          final productIds = cartData
+              .map((e) => e['product_id'])
+              .where((id) => id != null)
+              .toList();
+
+          if (productIds.isEmpty) return <CartItem>[];
+
+          try {
+            final productsData = await _client
+                .from('products')
+                .select()
+                .filter('id', 'in', productIds);
+
+            final productsMap = {
+              for (var p in productsData)
+                p['id'].toString(): Product.fromMap(p, p['id'].toString())
+            };
+
+            return cartData.map((cartItem) {
+              final productId = cartItem['product_id'].toString();
+              final product = productsMap[productId];
+
+              // If product not found (deleted?), handle gracefully
+              // For now we return the item with fallback data or filter it out?
+              // Let's fallback to ensure the user can at least delete it from cart.
+
+              return CartItem(
+                productId: productId,
+                productName: product?.name ?? 'منتج غير متاح',
+                price: product?.price ?? 0.0,
+                imageUrl: product?.imageUrl ?? '',
+                quantity: cartItem['quantity'] ?? 1,
+              );
+            }).toList();
+          } catch (e) {
+            // debugPrint("Error fetching cart products: $e");
+            return <CartItem>[];
+          }
         });
   }
 
