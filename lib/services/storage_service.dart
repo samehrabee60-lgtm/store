@@ -6,42 +6,49 @@ class StorageService {
   final SupabaseClient _client = SupabaseService.client;
   final String _bucketName = 'products'; // Must ensure this bucket exists
 
-  // Upload image
-  Future<String?> uploadImage(dynamic file) async {
-    // debugPrint('DEBUG: Starting uploadImage (Supabase)...');
+  // Upload generic file (image or pdf)
+  Future<String?> uploadFile({
+    required dynamic file,
+    required String bucketName,
+    required String fileExtension,
+    required String contentType,
+  }) async {
     try {
-      String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      String path = fileName; // Path inside the bucket
+      String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+      String path = fileName;
 
       if (kIsWeb) {
-        // debugPrint('DEBUG: Reading file as bytes for Web...');
         final bytes = await file.readAsBytes();
-        // debugPrint('DEBUG: Read ${bytes.length} bytes. uploading...');
-
-        await _client.storage.from(_bucketName).uploadBinary(
+        await _client.storage.from(bucketName).uploadBinary(
               path,
               bytes,
-              fileOptions:
-                  const FileOptions(contentType: 'image/jpeg', upsert: true),
+              fileOptions: FileOptions(contentType: contentType, upsert: true),
             );
       } else {
-        // debugPrint('DEBUG: Uploading file for Mobile/Desktop...');
-        await _client.storage.from(_bucketName).upload(
+        await _client.storage.from(bucketName).upload(
               path,
               file,
-              fileOptions:
-                  const FileOptions(contentType: 'image/jpeg', upsert: true),
+              fileOptions: FileOptions(contentType: contentType, upsert: true),
             );
       }
 
-      // debugPrint('DEBUG: Upload complete. Getting public URL...');
       final String publicUrl =
-          _client.storage.from(_bucketName).getPublicUrl(path);
-      // debugPrint('DEBUG: Got public URL: $publicUrl');
+          _client.storage.from(bucketName).getPublicUrl(path);
       return publicUrl;
     } catch (e) {
-      debugPrint('DEBUG: Error in uploadImage: $e');
+      debugPrint('DEBUG: Error in uploadFile: $e');
       rethrow;
     }
+  }
+
+  // Backward compatibility alias if needed, or update usage
+  Future<String?> uploadImage(dynamic file) async {
+    return uploadFile(
+      file: file,
+      bucketName: _bucketName,
+      fileExtension: 'jpg',
+      contentType: 'image/jpeg',
+    );
   }
 }

@@ -58,6 +58,8 @@ class DatabaseService {
       'price': product.price,
       'description': product.description,
       'image_url': product.imageUrl,
+      'pdf_url': product.pdfUrl,
+      'additional_images': product.additionalImages,
     }).eq('id', product.id);
   }
 
@@ -70,6 +72,8 @@ class DatabaseService {
       'price': product.price,
       'description': product.description,
       'image_url': product.imageUrl,
+      'pdf_url': product.pdfUrl,
+      'additional_images': product.additionalImages,
     });
   }
 

@@ -5,6 +5,8 @@ class Product {
   final double price;
   final String description;
   final String imageUrl;
+  final String? pdfUrl;
+  final List<String> additionalImages;
 
   Product({
     required this.id,
@@ -13,6 +15,8 @@ class Product {
     required this.price,
     required this.description,
     required this.imageUrl,
+    this.pdfUrl,
+    this.additionalImages = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -22,7 +26,9 @@ class Product {
       'category': category,
       'price': price,
       'description': description,
-      'imageUrl': imageUrl,
+      'image_url': imageUrl,
+      'pdf_url': pdfUrl,
+      'additional_images': additionalImages,
     };
   }
 
@@ -34,6 +40,8 @@ class Product {
       price: (map['price'] ?? 0.0).toDouble(),
       description: map['description'] ?? '',
       imageUrl: map['image_url'] ?? map['imageUrl'] ?? '',
+      pdfUrl: map['pdf_url'],
+      additionalImages: List<String>.from(map['additional_images'] ?? []),
     );
   }
 }

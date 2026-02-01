@@ -155,7 +155,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // عرض صورة المنتج
+            // عرض صورة المنتج (Main Image)
             CachedNetworkImage(
               imageUrl: widget.product.imageUrl,
               height: 300,
@@ -174,15 +174,81 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   const Icon(Icons.image_not_supported, size: 100),
             ),
 
+            // Additional Images Carousel (If any)
+            if (widget.product.additionalImages.isNotEmpty)
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.product.additionalImages.length,
+                  itemBuilder: (context, index) {
+                    final imgUrl = widget.product.additionalImages[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Option: Open full screen image viewer
+                          showDialog(
+                              context: context,
+                              builder: (_) => Dialog(
+                                    child: CachedNetworkImage(
+                                      imageUrl: imgUrl,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ));
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: imgUrl,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.product.name,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.product.name,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      // PDF Download Button
+                      if (widget.product.pdfUrl != null &&
+                          widget.product.pdfUrl!.isNotEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.picture_as_pdf,
+                              color: Colors.red, size: 30),
+                          tooltip: "تحميل الكتالوج",
+                          onPressed: () async {
+                            final uri = Uri.parse(widget.product.pdfUrl!);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri,
+                                  mode: LaunchMode.externalApplication);
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('لا يمكن فتح الملف')));
+                              }
+                            }
+                          },
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Text(
