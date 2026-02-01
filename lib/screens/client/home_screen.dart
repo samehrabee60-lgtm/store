@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _buildProductsSectionTitle(),
                             const SizedBox(height: 20),
                             SizedBox(
-                              height: 800, // Or dynamic
+                              // Removed fixed height 800 to allow dynamic expansion
                               child: _buildProductsList(horizontal: false),
                             ),
                           ],
@@ -527,6 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           // Web: Grid View
           return GridView.builder(
+            shrinkWrap: true, // Allow grid to take needed height
             padding: const EdgeInsets.all(0), // Padding handled by parent
             physics:
                 const NeverScrollableScrollPhysics(), // Scroll handled by SingleChildScrollView
